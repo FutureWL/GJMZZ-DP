@@ -1,0 +1,11 @@
+{
+  "name": "factory-platform-ui",
+  "private": true,
+  "packageManager": "pnpm@11.5.1",
+  "scripts": {
+    "dev": "pnpm -C apps/portal-ui dev",
+    "build": "pnpm -C apps/portal-ui build",
+    "preview": "pnpm -C apps/portal-ui preview"
+  }
+}
+

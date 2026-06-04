@@ -1,0 +1,14 @@
+**/node_modules
+**/dist
+**/dist-ssr
+**/*.local
+**/*.log
+
+.trae/
+
+.env
+.env.*
+
+.DS_Store
+Thumbs.db
+
