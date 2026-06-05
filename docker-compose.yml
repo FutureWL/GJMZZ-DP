@@ -1,0 +1,70 @@
+services:
+  gateway:
+    image: nginx:1.27-alpine
+    ports:
+      - "33700:80"
+    volumes:
+      - ./infra/nginx/gateway.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - portal-ui
+      - mobile-portal-ui
+      - cockpit-ui
+      - factory-api
+    restart: unless-stopped
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: factory
+      POSTGRES_USER: factory
+      POSTGRES_PASSWORD: factory
+    ports:
+      - "33705:5432"
+    volumes:
+      - factory-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U factory -d factory"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  factory-api:
+    build:
+      context: .
+      dockerfile: apps/factory-api/Dockerfile
+    environment:
+      PORT: 3001
+      DATABASE_URL: postgres://factory:factory@db:5432/factory
+    ports:
+      - "33704:3001"
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  portal-ui:
+    build:
+      context: .
+      dockerfile: apps/portal-ui/Dockerfile
+    ports:
+      - "33701:80"
+    restart: unless-stopped
+
+  mobile-portal-ui:
+    build:
+      context: .
+      dockerfile: apps/mobile-portal-ui/Dockerfile
+    ports:
+      - "33702:80"
+    restart: unless-stopped
+
+  cockpit-ui:
+    build:
+      context: .
+      dockerfile: apps/cockpit-ui/Dockerfile
+    ports:
+      - "33703:80"
+    restart: unless-stopped
+
+volumes:
+  factory-db: {}

@@ -9,6 +9,15 @@ pnpm install
 pnpm dev
 ```
 
+## 登录与用户中心（UI）
+
+- 登录页：`/login`（账号+密码、SSO 按钮均为占位交互）
+- 用户中心：
+  - `/account/profile`
+  - `/account/security`
+  - `/account/roles`
+  - `/account/sessions`
+
 Currently, two official plugins are available:
 
 - [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)

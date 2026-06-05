@@ -1,0 +1,48 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-bg-page: #f5f6f8;
+  --color-bg-surface: #ffffff;
+  --color-border-subtle: #eceef2;
+  --color-text-primary: #1b2430;
+  --color-text-secondary: #4a5568;
+  --color-text-tertiary: #8b95a7;
+  --color-icon-primary: #4a5568;
+
+  --color-primary: #2f6bff;
+  --color-primary-hover: #2457d6;
+  --color-focus: #9fc2ff;
+
+  --color-status-running: #22c55e;
+  --color-status-idle: #64748b;
+  --color-status-stopped: #f59e0b;
+  --color-status-fault: #ef4444;
+  --color-status-offline: #94a3b8;
+  --color-status-maintenance: #8b5cf6;
+  --color-status-alarm: #dc2626;
+
+  --shadow-1: 0 1px 2px rgba(16, 24, 40, 0.06);
+  --shadow-2: 0 4px 12px rgba(16, 24, 40, 0.1);
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  color: var(--color-text-secondary);
+  background: var(--color-bg-page);
+  font-family: system-ui, 'Segoe UI', 'Microsoft YaHei', 'PingFang SC', sans-serif;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  height: 100%;
+}
+

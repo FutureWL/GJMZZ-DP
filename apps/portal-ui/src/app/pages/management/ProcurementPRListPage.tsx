@@ -1,8 +1,9 @@
 import { Link } from 'react-router-dom'
-import { purchaseRequests } from '../../mock/data'
 import { Badge, type Tone } from '../../ui/Badge'
+import { Button } from '../../ui/Button'
 import { Card, CardBody, CardHeader, CardTitle } from '../../ui/Card'
 import { PageHeader } from '../../ui/PageHeader'
+import { useProcurementFlow } from '../../state/procurement/ProcurementFlowContext'
 
 function flowTone(status: string): Tone {
   if (status === 'draft') return 'neutral'
@@ -21,9 +22,23 @@ function flowLabel(status: string) {
 }
 
 export function ProcurementPRListPage() {
+  const flow = useProcurementFlow()
   return (
     <div>
-      <PageHeader title="采购申请（PR）" description="P0流程：PR → 审批 → RFQ/比价 → 定标 → PO（界面示例）" />
+      <PageHeader
+        title="采购申请（PR）"
+        description="P0流程：PR → 审批 → RFQ/比价 → 定标 → PO（界面示例）"
+        right={
+          <div className="flex flex-wrap items-center gap-2">
+            <Link to="/management/procurement/guide">
+              <Button variant="secondary">流程说明</Button>
+            </Link>
+            <Link to="/management/procurement/pr/new">
+              <Button variant="primary">发起 PR</Button>
+            </Link>
+          </div>
+        }
+      />
 
       <Card>
         <CardHeader>
@@ -43,7 +58,7 @@ export function ProcurementPRListPage() {
                 </tr>
               </thead>
               <tbody>
-                {purchaseRequests.map((pr) => (
+                {flow.requests.map((pr) => (
                   <tr key={pr.id} className="hover:bg-black/5 dark:hover:bg-white/5">
                     <td className="border-b border-[var(--color-border-subtle)] px-3 py-2">
                       <Link
@@ -58,7 +73,7 @@ export function ProcurementPRListPage() {
                     </td>
                     <td className="border-b border-[var(--color-border-subtle)] px-3 py-2">{pr.requester}</td>
                     <td className="border-b border-[var(--color-border-subtle)] px-3 py-2">
-                      ¥{pr.amount.toLocaleString()}
+                      ¥{pr.amountTotal.toLocaleString()}
                     </td>
                     <td className="border-b border-[var(--color-border-subtle)] px-3 py-2">
                       <Badge tone={flowTone(pr.status)}>{flowLabel(pr.status)}</Badge>

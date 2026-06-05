@@ -1,0 +1,251 @@
+import type {
+  AdditionalCenter,
+  AdditionalCenterId,
+  AdditionalContent,
+  AdditionalRequest,
+  AdditionalService,
+} from './models'
+
+export const additionalCenters: AdditionalCenter[] = [
+  {
+    id: 'tdc',
+    name: '人才发展中心',
+    description: '培训、学习、测评与能力档案',
+    contactName: '人才发展专员',
+    contactEmail: 'tdc@example.com',
+  },
+  {
+    id: 'party',
+    name: '党群',
+    description: '学习、活动与组织工作',
+    contactName: '党群专员',
+    contactEmail: 'party@example.com',
+  },
+  {
+    id: 'union',
+    name: '工会',
+    description: '福利、活动与帮扶',
+    contactName: '工会专员',
+    contactEmail: 'union@example.com',
+  },
+  {
+    id: 'women',
+    name: '妇联',
+    description: '活动、关爱与权益咨询',
+    contactName: '妇联专员',
+    contactEmail: 'women@example.com',
+  },
+]
+
+export const additionalServices: AdditionalService[] = [
+  {
+    id: 'tdc-train-enroll',
+    centerId: 'tdc',
+    name: '培训报名',
+    category: '培训',
+    description: '报名参加公司培训课程',
+    type: 'enroll',
+    enabled: true,
+    requireApproval: true,
+    formSchema: [
+      { key: 'course', label: '课程名称', required: true, placeholder: '例如：精密加工工艺提升' },
+      { key: 'session', label: '场次/期次', required: true, placeholder: '例如：2026年6月第1期' },
+      { key: 'reason', label: '报名理由', placeholder: '可选' },
+    ],
+  },
+  {
+    id: 'tdc-assessment',
+    centerId: 'tdc',
+    name: '测评申请',
+    category: '测评',
+    description: '发起技能/能力测评申请',
+    type: 'apply',
+    enabled: true,
+    requireApproval: true,
+    formSchema: [
+      { key: 'assessment', label: '测评项目', required: true, placeholder: '例如：数控编程能力' },
+      { key: 'preferredTime', label: '期望时间', required: true, placeholder: '例如：下周三下午' },
+      { key: 'note', label: '备注', placeholder: '可选' },
+    ],
+  },
+  {
+    id: 'party-event-enroll',
+    centerId: 'party',
+    name: '活动报名（主题党日/志愿）',
+    category: '活动',
+    description: '报名参加党群活动',
+    type: 'enroll',
+    enabled: true,
+    requireApproval: false,
+    formSchema: [
+      { key: 'event', label: '活动名称', required: true, placeholder: '例如：主题党日（6月）' },
+      { key: 'mobile', label: '联系电话', required: true, placeholder: '手机号' },
+      { key: 'note', label: '备注', placeholder: '可选' },
+    ],
+  },
+  {
+    id: 'party-study',
+    centerId: 'party',
+    name: '学习打卡',
+    category: '学习',
+    description: '提交学习内容与心得',
+    type: 'apply',
+    enabled: true,
+    requireApproval: false,
+    formSchema: [
+      { key: 'topic', label: '学习主题', required: true, placeholder: '例如：中央八项规定学习' },
+      { key: 'summary', label: '学习心得', required: true, placeholder: '200字以内' },
+    ],
+  },
+  {
+    id: 'union-benefit',
+    centerId: 'union',
+    name: '福利申领登记',
+    category: '福利',
+    description: '登记并申请工会福利',
+    type: 'apply',
+    enabled: true,
+    requireApproval: true,
+    formSchema: [
+      { key: 'benefit', label: '福利项目', required: true, placeholder: '例如：节日福利' },
+      { key: 'address', label: '收货地址', required: true, placeholder: '用于邮寄/寄送' },
+      { key: 'note', label: '备注', placeholder: '可选' },
+    ],
+  },
+  {
+    id: 'union-support',
+    centerId: 'union',
+    name: '困难帮扶申请',
+    category: '帮扶',
+    description: '提交困难帮扶材料并申请审核',
+    type: 'apply',
+    enabled: true,
+    requireApproval: true,
+    formSchema: [
+      { key: 'situation', label: '困难情况说明', required: true, placeholder: '请简要说明' },
+      { key: 'amount', label: '申请金额', required: true, placeholder: '例如：3000' },
+      { key: 'attachments', label: '材料清单', placeholder: '例如：证明材料、票据等' },
+    ],
+  },
+  {
+    id: 'women-care',
+    centerId: 'women',
+    name: '关爱帮扶申请',
+    category: '帮扶',
+    description: '提交关爱帮扶申请',
+    type: 'apply',
+    enabled: true,
+    requireApproval: true,
+    formSchema: [
+      { key: 'need', label: '需求说明', required: true, placeholder: '请简要描述需求' },
+      { key: 'preferredContact', label: '联系方式', required: true, placeholder: '手机号/邮箱' },
+      { key: 'note', label: '备注', placeholder: '可选' },
+    ],
+  },
+  {
+    id: 'women-consult',
+    centerId: 'women',
+    name: '权益咨询登记',
+    category: '咨询',
+    description: '提交咨询问题，专员在线答复',
+    type: 'apply',
+    enabled: true,
+    requireApproval: false,
+    formSchema: [
+      { key: 'topic', label: '咨询主题', required: true, placeholder: '例如：劳动权益咨询' },
+      { key: 'detail', label: '问题描述', required: true, placeholder: '请详细说明' },
+      { key: 'preferredReply', label: '期望回复方式', placeholder: '电话/邮件/站内消息' },
+    ],
+  },
+]
+
+export const additionalContents: AdditionalContent[] = [
+  {
+    id: 'notice-tdc-001',
+    centerId: 'tdc',
+    type: 'notice',
+    title: '6月培训计划已发布',
+    body: '本月新增精密加工工艺、质量体系、项目管理等课程，欢迎报名。',
+    createdAt: '2026-06-01 09:00',
+    pinned: true,
+  },
+  {
+    id: 'notice-party-001',
+    centerId: 'party',
+    type: 'notice',
+    title: '主题党日活动预告',
+    body: '本月主题党日将围绕作风建设学习开展交流，请按通知报名参加。',
+    createdAt: '2026-06-02 10:30',
+    pinned: true,
+  },
+  {
+    id: 'notice-union-001',
+    centerId: 'union',
+    type: 'notice',
+    title: '节日福利登记开始',
+    body: '请按福利申领登记入口填写信息，截止日期 6月10日。',
+    createdAt: '2026-06-03 11:00',
+    pinned: true,
+  },
+  {
+    id: 'notice-women-001',
+    centerId: 'women',
+    type: 'notice',
+    title: '关爱活动报名通道开启',
+    body: '本月将组织专题沙龙与健康讲座，欢迎报名参与。',
+    createdAt: '2026-06-04 14:20',
+    pinned: true,
+  },
+  {
+    id: 'faq-tdc-001',
+    centerId: 'tdc',
+    type: 'faq',
+    title: '培训报名后如何取消？',
+    body: '进入“我的申请”，选择对应申请单，点击撤回或联系专员处理。',
+    createdAt: '2026-05-20 10:00',
+  },
+]
+
+const sampleRequests: AdditionalRequest[] = [
+  {
+    id: 'REQ-AD-20260605-001',
+    centerId: 'tdc',
+    serviceId: 'tdc-train-enroll',
+    serviceName: '培训报名',
+    applicant: '张三',
+    status: 'submitted',
+    createdAt: '2026-06-05 09:12',
+    updatedAt: '2026-06-05 09:12',
+    currentAssignee: null,
+    formData: { course: '精密加工工艺提升', session: '2026年6月第1期', reason: '岗位能力提升' },
+    timeline: [{ at: '2026-06-05 09:12', actor: '张三', action: '提交申请' }],
+  },
+  {
+    id: 'REQ-AD-20260604-003',
+    centerId: 'union',
+    serviceId: 'union-benefit',
+    serviceName: '福利申领登记',
+    applicant: '李四',
+    status: 'in_progress',
+    createdAt: '2026-06-04 15:30',
+    updatedAt: '2026-06-05 08:40',
+    currentAssignee: '工会专员',
+    formData: { benefit: '节日福利', address: '制造中心办公楼 3F', note: '' },
+    timeline: [
+      { at: '2026-06-04 15:30', actor: '李四', action: '提交申请' },
+      { at: '2026-06-04 16:10', actor: '工会专员', action: '受理', note: '已确认信息，处理中' },
+      { at: '2026-06-05 08:40', actor: '工会专员', action: '处理中', note: '已安排发放' },
+    ],
+  },
+]
+
+export function buildInitialAdditionalRequests(): AdditionalRequest[] {
+  return sampleRequests
+}
+
+export const CENTER_PATH: Record<AdditionalCenterId, string> = {
+  tdc: '/additional/tdc',
+  party: '/additional/party',
+  union: '/additional/union',
+  women: '/additional/women',
+}

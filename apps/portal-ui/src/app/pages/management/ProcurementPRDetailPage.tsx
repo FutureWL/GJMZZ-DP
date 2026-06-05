@@ -1,30 +1,59 @@
 import { Link, useParams } from 'react-router-dom'
-import { purchaseRequests } from '../../mock/data'
 import { Badge } from '../../ui/Badge'
 import { Button } from '../../ui/Button'
 import { Card, CardBody, CardHeader, CardTitle } from '../../ui/Card'
 import { PageHeader } from '../../ui/PageHeader'
+import { Input } from '../../ui/Input'
+import { useState } from 'react'
+import { useProcurementFlow } from '../../state/procurement/ProcurementFlowContext'
 
 export function ProcurementPRDetailPage() {
   const { id } = useParams()
-  const pr = purchaseRequests.find((x) => x.id === id)
+  const flow = useProcurementFlow()
+  const pr = id ? flow.getRequest(id) : undefined
+  const [note, setNote] = useState('')
 
   return (
     <div>
       <PageHeader
         title={pr ? `PR 详情：${pr.id}` : 'PR 详情'}
-        description="用于演示采购闭环：PR → 审批 → RFQ/比价 → 定标 → PO"
+        description={pr ? `${pr.title}｜当前节点：${pr.currentAssignee ?? '-'}` : '用于演示采购闭环：PR → 审批 → RFQ/比价 → 定标 → PO'}
         right={
-          <div className="flex items-center gap-2">
-            <Link to="/management/approval">
-              <Button variant="secondary">去审批中心</Button>
+          <div className="flex flex-wrap items-center gap-2">
+            <Link to="/management/approval?from=procurement-pr">
+              <Button variant="secondary">审批中心</Button>
             </Link>
-            <Link to="/management/procurement/rfq/RFQ-20260605-001">
-              <Button variant="secondary">查看 RFQ</Button>
-            </Link>
-            <Link to="/management/procurement/po/PO-20260605-018">
-              <Button variant="primary">查看 PO</Button>
-            </Link>
+            {pr?.status === 'in_review' ? (
+              <>
+                <Button
+                  variant="primary"
+                  onClick={() => {
+                    flow.approve(pr.id, note || undefined)
+                    setNote('')
+                  }}
+                >
+                  同意
+                </Button>
+                <Button
+                  variant="secondary"
+                  onClick={() => {
+                    flow.returnToApplicant(pr.id, note || undefined)
+                    setNote('')
+                  }}
+                >
+                  退回修改
+                </Button>
+                <Button
+                  variant="danger"
+                  onClick={() => {
+                    flow.reject(pr.id, note || undefined)
+                    setNote('')
+                  }}
+                >
+                  驳回
+                </Button>
+              </>
+            ) : null}
           </div>
         }
       />
@@ -43,7 +72,9 @@ export function ProcurementPRDetailPage() {
               <div>
                 <div className="text-xs text-[var(--color-text-tertiary)]">状态</div>
                 <div className="mt-1">
-                  <Badge tone="info">{pr?.status ?? '-'}</Badge>
+                  <Badge tone={pr?.status === 'approved' ? 'success' : pr?.status === 'rejected' ? 'error' : pr?.status === 'in_review' ? 'info' : 'neutral'}>
+                    {pr?.status ?? '-'}
+                  </Badge>
                 </div>
               </div>
               <div>
@@ -53,8 +84,16 @@ export function ProcurementPRDetailPage() {
               <div>
                 <div className="text-xs text-[var(--color-text-tertiary)]">金额</div>
                 <div className="mt-1 text-[var(--color-text-primary)]">
-                  {pr ? `¥${pr.amount.toLocaleString()}` : '-'}
+                  {pr ? `¥${pr.amountTotal.toLocaleString()}` : '-'}
                 </div>
+              </div>
+              <div>
+                <div className="text-xs text-[var(--color-text-tertiary)]">项目</div>
+                <div className="mt-1 text-[var(--color-text-primary)]">{pr?.projectName ?? '-'}</div>
+              </div>
+              <div>
+                <div className="text-xs text-[var(--color-text-tertiary)]">成本中心</div>
+                <div className="mt-1 text-[var(--color-text-primary)]">{pr?.costCenterName ?? '-'}</div>
               </div>
               <div>
                 <div className="text-xs text-[var(--color-text-tertiary)]">创建时间</div>
@@ -62,49 +101,106 @@ export function ProcurementPRDetailPage() {
               </div>
               <div>
                 <div className="text-xs text-[var(--color-text-tertiary)]">备注</div>
-                <div className="mt-1 text-[var(--color-text-primary)]">仅界面占位</div>
+                <div className="mt-1 text-[var(--color-text-primary)]">{note || '—'}</div>
               </div>
             </div>
 
-            <div className="mt-4 flex items-center gap-2">
-              <Button variant="primary">发起审批（占位）</Button>
-              <Button variant="secondary">保存草稿（占位）</Button>
+            <div className="mt-4">
+              <div className="mb-1 text-xs font-semibold text-[var(--color-text-tertiary)]">处理意见（可选）</div>
+              <Input value={note} onChange={(e) => setNote(e.target.value)} placeholder="同意/退回/驳回原因（mock）" />
             </div>
           </CardBody>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle>审批轨迹（占位）</CardTitle>
+            <CardTitle>流程节点</CardTitle>
           </CardHeader>
           <CardBody>
             <div className="space-y-3 text-sm text-[var(--color-text-secondary)]">
-              <div className="rounded-[10px] border border-[var(--color-border-subtle)] bg-[var(--color-bg-surface)] p-3">
-                <div className="flex items-center justify-between gap-3">
-                  <div className="font-medium text-[var(--color-text-primary)]">提交</div>
-                  <Badge tone="success">已完成</Badge>
+              {pr?.nodes?.map((n) => (
+                <div key={n.key} className="rounded-[10px] border border-[var(--color-border-subtle)] bg-[var(--color-bg-surface)] p-3">
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="min-w-0">
+                      <div className="truncate font-medium text-[var(--color-text-primary)]">{n.label}</div>
+                      <div className="mt-1 text-xs text-[var(--color-text-tertiary)]">{n.assignee}</div>
+                    </div>
+                    <Badge tone={n.status === 'done' ? 'success' : n.key === pr.currentNodeKey ? 'info' : 'neutral'}>
+                      {n.status === 'done' ? '已完成' : n.key === pr.currentNodeKey ? '处理中' : '未开始'}
+                    </Badge>
+                  </div>
+                  {n.completedAt ? <div className="mt-1 text-xs text-[var(--color-text-tertiary)]">{n.completedAt}</div> : null}
                 </div>
-                <div className="mt-1 text-xs text-[var(--color-text-tertiary)]">2026-06-05 09:20</div>
-              </div>
-              <div className="rounded-[10px] border border-[var(--color-border-subtle)] bg-[var(--color-bg-surface)] p-3">
-                <div className="flex items-center justify-between gap-3">
-                  <div className="font-medium text-[var(--color-text-primary)]">部门负责人审批</div>
-                  <Badge tone="info">进行中</Badge>
-                </div>
-                <div className="mt-1 text-xs text-[var(--color-text-tertiary)]">待处理</div>
-              </div>
-              <div className="rounded-[10px] border border-[var(--color-border-subtle)] bg-[var(--color-bg-surface)] p-3">
-                <div className="flex items-center justify-between gap-3">
-                  <div className="font-medium text-[var(--color-text-primary)]">采购审批</div>
-                  <Badge tone="neutral">未开始</Badge>
-                </div>
-                <div className="mt-1 text-xs text-[var(--color-text-tertiary)]">占位</div>
-              </div>
+              )) ?? null}
             </div>
           </CardBody>
         </Card>
       </div>
+
+      <Card className="mt-4">
+        <CardHeader>
+          <CardTitle>明细</CardTitle>
+        </CardHeader>
+        <CardBody>
+          <div className="overflow-auto">
+            <table className="w-full table-auto border-separate border-spacing-0 text-left text-sm">
+              <thead>
+                <tr className="text-xs text-[var(--color-text-tertiary)]">
+                  <th className="border-b border-[var(--color-border-subtle)] px-3 py-2 font-semibold">物料</th>
+                  <th className="border-b border-[var(--color-border-subtle)] px-3 py-2 font-semibold">规格</th>
+                  <th className="border-b border-[var(--color-border-subtle)] px-3 py-2 font-semibold">数量</th>
+                  <th className="border-b border-[var(--color-border-subtle)] px-3 py-2 font-semibold">单价</th>
+                  <th className="border-b border-[var(--color-border-subtle)] px-3 py-2 font-semibold">金额</th>
+                  <th className="border-b border-[var(--color-border-subtle)] px-3 py-2 font-semibold">需求日期</th>
+                </tr>
+              </thead>
+              <tbody>
+                {pr?.lines?.map((l) => (
+                  <tr key={l.id} className="hover:bg-black/5 dark:hover:bg-white/5">
+                    <td className="border-b border-[var(--color-border-subtle)] px-3 py-2">{l.material}</td>
+                    <td className="border-b border-[var(--color-border-subtle)] px-3 py-2">{l.spec}</td>
+                    <td className="border-b border-[var(--color-border-subtle)] px-3 py-2">
+                      {l.qty} {l.uom}
+                    </td>
+                    <td className="border-b border-[var(--color-border-subtle)] px-3 py-2">¥{l.unitPrice.toLocaleString()}</td>
+                    <td className="border-b border-[var(--color-border-subtle)] px-3 py-2">¥{l.amount.toLocaleString()}</td>
+                    <td className="border-b border-[var(--color-border-subtle)] px-3 py-2">{l.needBy}</td>
+                  </tr>
+                )) ?? null}
+              </tbody>
+            </table>
+          </div>
+        </CardBody>
+      </Card>
+
+      <Card className="mt-4">
+        <CardHeader>
+          <CardTitle>附件（mock）</CardTitle>
+        </CardHeader>
+        <CardBody>
+          <div className="flex flex-wrap gap-2">
+            {pr?.attachments?.length ? (
+              pr.attachments.map((a) => (
+                <span
+                  key={a}
+                  className="inline-flex items-center rounded-[6px] border border-[var(--color-border-subtle)] bg-[var(--color-bg-surface)] px-2 py-1 text-xs text-[var(--color-text-secondary)]"
+                >
+                  {a}
+                </span>
+              ))
+            ) : (
+              <span className="text-sm text-[var(--color-text-tertiary)]">暂无附件</span>
+            )}
+          </div>
+          <div className="mt-3">
+            <input
+              type="file"
+              multiple
+              className="block w-full text-sm text-[var(--color-text-tertiary)] file:mr-3 file:rounded-[6px] file:border-0 file:bg-[var(--color-bg-surface)] file:px-3 file:py-2 file:text-sm file:font-medium file:text-[var(--color-text-primary)]"
+            />
+          </div>
+        </CardBody>
+      </Card>
     </div>
   )
 }
-
