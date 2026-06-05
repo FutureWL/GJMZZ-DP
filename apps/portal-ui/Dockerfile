@@ -1,6 +1,14 @@
-FROM node:20-alpine AS base
+FROM node:22-alpine AS base
 
 WORKDIR /workspace
+
+ARG HTTP_PROXY
+ARG HTTPS_PROXY
+ARG NO_PROXY
+
+ENV HTTP_PROXY=$HTTP_PROXY
+ENV HTTPS_PROXY=$HTTPS_PROXY
+ENV NO_PROXY=$NO_PROXY
 
 RUN corepack enable && corepack prepare pnpm@11.5.1 --activate
 
