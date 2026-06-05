@@ -12,6 +12,9 @@ services:
       - mobile-portal-ui
       - cockpit-ui
       - factory-api
+      - cloudbeaver
+      - rabbitmq
+      - minio
     restart: unless-stopped
 
   db:
@@ -46,6 +49,53 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "33707:6379"
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
+
+  rabbitmq:
+    image: rabbitmq:3.13-management-alpine
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER:-factory}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS:-factory}
+    ports:
+      - "33708:5672"
+      - "33709:15672"
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+      - ./infra/rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
+    restart: unless-stopped
+
+  minio:
+    image: minio/minio:latest
+    command: ["server", "/data", "--console-address", ":9001"]
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin}
+      MINIO_SERVER_URL: ${MINIO_SERVER_URL:-http://localhost:33710}
+      MINIO_BROWSER_REDIRECT_URL: ${MINIO_BROWSER_REDIRECT_URL:-http://localhost:33700/tools/minio}
+    ports:
+      - "33710:9000"
+      - "33711:9001"
+    volumes:
+      - minio-data:/data
+    restart: unless-stopped
+
+  cloudbeaver:
+    image: dbeaver/cloudbeaver:latest
+    ports:
+      - "33706:8978"
+    volumes:
+      - cloudbeaver-data:/opt/cloudbeaver/workspace
+    depends_on:
+      - db
     restart: unless-stopped
 
   portal-ui:
@@ -86,3 +136,7 @@ services:
 
 volumes:
   factory-db: {}
+  redis-data: {}
+  rabbitmq-data: {}
+  minio-data: {}
+  cloudbeaver-data: {}
