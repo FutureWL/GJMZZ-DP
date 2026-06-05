@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Factory Platform Gateway</title>
+    <style>
+      :root { color-scheme: light; }
+      body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans SC", "PingFang SC", "Microsoft YaHei", Arial, sans-serif; background: #0b1020; color: #e7eaf3; }
+      header { padding: 28px 24px 12px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+      h1 { margin: 0; font-size: 18px; font-weight: 600; letter-spacing: 0.2px; }
+      p { margin: 10px 0 0; opacity: 0.85; line-height: 1.6; }
+      main { padding: 18px 24px 28px; max-width: 980px; }
+      .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; margin-top: 14px; }
+      a.card { display: block; padding: 14px 14px; border-radius: 10px; text-decoration: none; color: inherit; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); }
+      a.card:hover { background: rgba(255,255,255,0.09); border-color: rgba(255,255,255,0.14); }
+      .title { font-size: 14px; font-weight: 600; }
+      .desc { margin-top: 6px; font-size: 12px; opacity: 0.8; line-height: 1.5; }
+      .url { margin-top: 10px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; font-size: 12px; opacity: 0.85; }
+      footer { padding: 12px 24px 22px; border-top: 1px solid rgba(255,255,255,0.08); opacity: 0.75; font-size: 12px; }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Factory Platform Gateway</h1>
+      <p>这是 Nginx 网关默认页面。下面链接保留各服务的端口号。</p>
+    </header>
+    <main>
+      <div class="grid">
+        <a class="card" href="http://localhost:33701/" target="_blank" rel="noreferrer">
+          <div class="title">Portal UI</div>
+          <div class="desc">管理端门户</div>
+          <div class="url">http://localhost:33701/</div>
+        </a>
+        <a class="card" href="http://localhost:33702/" target="_blank" rel="noreferrer">
+          <div class="title">Mobile Portal UI</div>
+          <div class="desc">移动端门户</div>
+          <div class="url">http://localhost:33702/</div>
+        </a>
+        <a class="card" href="http://localhost:33703/" target="_blank" rel="noreferrer">
+          <div class="title">Cockpit UI</div>
+          <div class="desc">驾驶舱/大屏</div>
+          <div class="url">http://localhost:33703/</div>
+        </a>
+        <a class="card" href="http://localhost:33704/" target="_blank" rel="noreferrer">
+          <div class="title">Factory API</div>
+          <div class="desc">后端服务（3001 映射）</div>
+          <div class="url">http://localhost:33704/</div>
+        </a>
+        <a class="card" href="http://localhost:33706/" target="_blank" rel="noreferrer">
+          <div class="title">CloudBeaver</div>
+          <div class="desc">数据库管理工具</div>
+          <div class="url">http://localhost:33706/</div>
+        </a>
+        <a class="card" href="http://localhost:33709/" target="_blank" rel="noreferrer">
+          <div class="title">RabbitMQ Management</div>
+          <div class="desc">消息队列管理台</div>
+          <div class="url">http://localhost:33709/</div>
+        </a>
+        <a class="card" href="http://localhost:33711/" target="_blank" rel="noreferrer">
+          <div class="title">MinIO Console</div>
+          <div class="desc">对象存储管理台</div>
+          <div class="url">http://localhost:33711/</div>
+        </a>
+        <a class="card" href="http://localhost:33714/" target="_blank" rel="noreferrer">
+          <div class="title">TDengine Explorer</div>
+          <div class="desc">时序库管理/查询</div>
+          <div class="url">http://localhost:33714/</div>
+        </a>
+      </div>
+    </main>
+    <footer>Gateway: http://localhost:33700/</footer>
+  </body>
+</html>

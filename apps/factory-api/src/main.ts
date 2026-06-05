@@ -1,4 +1,5 @@
 import { NestFactory } from '@nestjs/core'
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify'
 import 'dotenv/config'
 
@@ -15,6 +16,15 @@ async function bootstrap() {
     origin: true,
     credentials: true,
   })
+
+  const swaggerConfig = new DocumentBuilder()
+    .setTitle('Factory API')
+    .setDescription('Factory platform API')
+    .setVersion('1.0.0')
+    .build()
+
+  const swaggerDocument = SwaggerModule.createDocument(app, swaggerConfig)
+  SwaggerModule.setup('docs', app, swaggerDocument)
 
   const port = Number(process.env.PORT ?? 3001)
   await app.listen(port, '0.0.0.0')
