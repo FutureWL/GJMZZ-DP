@@ -1,3 +1,5 @@
+name: factory-platform
+
 services:
   gateway:
     image: nginx:1.27-alpine
