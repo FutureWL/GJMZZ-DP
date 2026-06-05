@@ -1,15 +1,60 @@
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { alarms, workOrders } from '../../mock/data'
+import { useAuth } from '../../state/auth/useAuth'
 import { Badge } from '../../ui/Badge'
 import { Card, CardBody, CardHeader, CardTitle } from '../../ui/Card'
 import { PageHeader } from '../../ui/PageHeader'
 
 export function ProductionOverviewPage() {
+  const auth = useAuth()
+  const [factoryCount, setFactoryCount] = useState<number | null>(null)
+  const [factoryError, setFactoryError] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (!auth.token) return
+    fetch('/api/factories', {
+      headers: {
+        Authorization: `Bearer ${auth.token}`,
+      },
+    })
+      .then(async (res) => {
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status}`)
+        }
+        return (await res.json()) as unknown
+      })
+      .then((data) => {
+        if (!Array.isArray(data)) {
+          throw new Error('Invalid response')
+        }
+        setFactoryCount(data.length)
+        setFactoryError(null)
+      })
+      .catch((e) => {
+        setFactoryCount(null)
+        setFactoryError(e instanceof Error ? e.message : 'Request failed')
+      })
+  }, [auth.token])
+
   return (
     <div>
       <PageHeader title="工厂总览" description="生产域：摘要 + 异常优先（示例数据）" />
 
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-5">
+        <Card>
+          <CardHeader>
+            <CardTitle>工厂（API）</CardTitle>
+          </CardHeader>
+          <CardBody>
+            <div className="text-3xl font-semibold text-[var(--color-text-primary)]">
+              {factoryCount ?? '--'}
+            </div>
+            <div className="mt-2 text-sm text-[var(--color-text-tertiary)]">
+              {factoryError ? `请求失败：${factoryError}` : '来自 factory-api /factories'}
+            </div>
+          </CardBody>
+        </Card>
         <Card>
           <CardHeader>
             <CardTitle>产量（今日）</CardTitle>
@@ -112,4 +157,3 @@ export function ProductionOverviewPage() {
     </div>
   )
 }
-

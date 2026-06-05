@@ -1,0 +1,75 @@
+{
+  "realm": "factory-platform",
+  "enabled": true,
+  "displayName": "Factory Platform",
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "registrationAllowed": false,
+  "resetPasswordAllowed": false,
+  "clients": [
+    {
+      "clientId": "portal-ui",
+      "name": "Portal UI",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "implicitFlowEnabled": false,
+      "serviceAccountsEnabled": false,
+      "frontchannelLogout": true,
+      "redirectUris": ["http://localhost:33700/portal/*", "http://localhost:33701/*"],
+      "webOrigins": ["http://localhost:33700", "http://localhost:33701"]
+    },
+    {
+      "clientId": "mobile-portal-ui",
+      "name": "Mobile Portal UI",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "implicitFlowEnabled": false,
+      "serviceAccountsEnabled": false,
+      "frontchannelLogout": true,
+      "redirectUris": ["http://localhost:33700/m/*", "http://localhost:33702/*", "http://localhost:33702/m/*"],
+      "webOrigins": ["http://localhost:33700", "http://localhost:33702"]
+    },
+    {
+      "clientId": "cockpit-ui",
+      "name": "Cockpit UI",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "implicitFlowEnabled": false,
+      "serviceAccountsEnabled": false,
+      "frontchannelLogout": true,
+      "redirectUris": ["http://localhost:33700/cockpit/*", "http://localhost:33703/*", "http://localhost:33703/cockpit/*"],
+      "webOrigins": ["http://localhost:33700", "http://localhost:33703"]
+    },
+    {
+      "clientId": "dev-cli",
+      "name": "Dev CLI",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": true,
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": true,
+      "implicitFlowEnabled": false,
+      "serviceAccountsEnabled": false
+    }
+  ],
+  "users": [
+    {
+      "username": "demo",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Demo",
+      "lastName": "User",
+      "email": "demo@example.com",
+      "credentials": [{ "type": "password", "value": "demo", "temporary": false }]
+    }
+  ]
+}

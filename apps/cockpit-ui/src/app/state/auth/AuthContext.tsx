@@ -7,10 +7,8 @@ export interface AuthContextValue {
   user: User | null
   isLoading: boolean
   isAuthenticated: boolean
-  signInWithPassword: (username: string, password: string) => Promise<void>
   signInWithSSO: (nextPath?: string) => Promise<void>
   signOut: () => void
-  updateUser: (user: User) => void
 }
 
 export const AuthContext = createContext<AuthContextValue | null>(null)
@@ -31,7 +29,9 @@ function buildUserFromToken(tokenParsed: Record<string, unknown>): User {
   const email = typeof tokenParsed.email === 'string' ? tokenParsed.email : 'user@example.com'
 
   const realmAccess = tokenParsed.realm_access as { roles?: unknown } | undefined
-  const roles = Array.isArray(realmAccess?.roles) ? realmAccess?.roles.filter((r): r is string => typeof r === 'string') : []
+  const roles = Array.isArray(realmAccess?.roles)
+    ? realmAccess?.roles.filter((r): r is string => typeof r === 'string')
+    : []
 
   const displayName = name ?? preferredUsername ?? '用户'
   const avatarText = displayName.slice(0, 1).toUpperCase()
@@ -40,8 +40,8 @@ function buildUserFromToken(tokenParsed: Record<string, unknown>): User {
     id: sub,
     name: displayName,
     employeeId: preferredUsername ?? sub,
-    department: '制造中心',
-    position: '制造工程师',
+    department: '驾驶舱',
+    position: '',
     phone: '',
     email,
     avatarText,
@@ -67,7 +67,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .then((authenticated) => {
         if (!mounted) return
         if (authenticated && keycloak.token && keycloak.tokenParsed) {
-          setState({ token: keycloak.token, user: buildUserFromToken(keycloak.tokenParsed as Record<string, unknown>) })
+          setState({
+            token: keycloak.token,
+            user: buildUserFromToken(keycloak.tokenParsed as Record<string, unknown>),
+          })
         } else {
           setState(null)
         }
@@ -89,21 +92,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .then((refreshed) => {
           if (!refreshed) return
           if (!keycloak.token || !keycloak.tokenParsed) return
-          setState({ token: keycloak.token, user: buildUserFromToken(keycloak.tokenParsed as Record<string, unknown>) })
+          setState({
+            token: keycloak.token,
+            user: buildUserFromToken(keycloak.tokenParsed as Record<string, unknown>),
+          })
         })
         .catch(() => {})
     }, 10_000)
     return () => window.clearInterval(id)
   }, [state?.token])
-
-  const signInWithPassword = useCallback(async (username: string, password: string) => {
-    const u = username.trim()
-    const p = password.trim()
-    if (!u || !p) {
-      throw new Error('账号或密码不能为空')
-    }
-    await keycloak.login({ loginHint: u, redirectUri: buildRedirectUri('/production/overview') })
-  }, [])
 
   const signInWithSSO = useCallback(async (nextPath?: string) => {
     await keycloak.login({ redirectUri: buildRedirectUri(nextPath) })
@@ -114,26 +111,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     keycloak.logout({ redirectUri: buildRedirectUri('/login') }).catch(() => {})
   }, [])
 
-  const updateUser = useCallback((user: User) => {
-    setState((prev) => {
-      if (!prev) return prev
-      const next: AuthState = { ...prev, user }
-      return next
-    })
-  }, [])
-
   const value = useMemo<AuthContextValue>(
     () => ({
       token: state?.token ?? null,
       user: state?.user ?? null,
       isLoading,
       isAuthenticated: !!state?.token,
-      signInWithPassword,
       signInWithSSO,
       signOut,
-      updateUser,
     }),
-    [isLoading, signInWithPassword, signInWithSSO, signOut, state?.token, state?.user, updateUser],
+    [isLoading, signInWithSSO, signOut, state?.token, state?.user],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

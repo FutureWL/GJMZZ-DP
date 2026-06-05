@@ -19,7 +19,7 @@ services:
 
   keycloak:
     image: quay.io/keycloak/keycloak:26.0.5
-    command: ["start-dev", "--http-port=8080"]
+    command: ["start-dev", "--http-port=8080", "--import-realm"]
     depends_on:
       postgres:
         condition: service_healthy
@@ -40,6 +40,7 @@ services:
       - "${KC_HTTP_PORT}:8080"
     volumes:
       - kc_data:/opt/keycloak/data
+      - ./realm:/opt/keycloak/data/import:ro
 
 volumes:
   kc_pg_data:

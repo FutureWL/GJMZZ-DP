@@ -21,6 +21,7 @@ async function bootstrap() {
     .setTitle('Factory API')
     .setDescription('Factory platform API')
     .setVersion('1.0.0')
+    .addBearerAuth()
     .build()
 
   const swaggerDocument = SwaggerModule.createDocument(app, swaggerConfig)

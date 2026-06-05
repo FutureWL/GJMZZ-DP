@@ -17,6 +17,13 @@ From this folder:
 - Copy `.env.example` to `.env`
 - Run `docker compose --env-file .env up -d`
 
+## Realm (auto import)
+
+- Realm: `factory-platform`
+- Client (SPA): `portal-ui`
+- Client (CLI): `dev-cli` (password grant for local testing)
+- Demo user: `demo / demo`
+
 ## Access
 
 - Keycloak: `http://sso.corp.aygjm.lan:18080/`

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Navigate, useLocation, useNavigate } from 'react-router-dom'
+import { Navigate, useLocation } from 'react-router-dom'
 import { formatDocumentTitle } from '../../appMeta'
 import { useAuth } from '../../state/auth/useAuth'
 import { Button } from '../../ui/Button'
@@ -9,7 +9,6 @@ import { Input } from '../../ui/Input'
 
 export function LoginPage() {
   const auth = useAuth()
-  const nav = useNavigate()
   const loc = useLocation()
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
@@ -42,7 +41,7 @@ export function LoginPage() {
           <div className="rounded-[14px] border border-[var(--color-border-subtle)] bg-[var(--color-bg-surface)] p-5 shadow-[var(--shadow-2)]">
             <div className="text-sm font-semibold text-[var(--color-text-primary)]">提示</div>
             <div className="mt-2 text-sm text-[var(--color-text-secondary)]">
-              此登录仅用于界面演示，账号/密码任意非空即可；也可点击 SSO 登录。
+              此环境使用 Keycloak SSO 登录（本地 sso-dev）。默认用户 demo / demo。
             </div>
           </div>
         </div>
@@ -92,8 +91,7 @@ export function LoginPage() {
                     setError(null)
                     setLoading(true)
                     try {
-                      await auth.signInWithPassword(username, password)
-                      nav(next, { replace: true })
+                      await auth.signInWithSSO(next)
                     } catch (e) {
                       setError(e instanceof Error ? e.message : '登录失败')
                     } finally {
@@ -118,8 +116,7 @@ export function LoginPage() {
                     setError(null)
                     setLoading(true)
                     try {
-                      await auth.signInWithSSO()
-                      nav(next, { replace: true })
+                      await auth.signInWithSSO(next)
                     } catch {
                       setError('SSO 登录失败')
                     } finally {

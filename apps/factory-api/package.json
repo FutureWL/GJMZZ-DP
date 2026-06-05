@@ -16,6 +16,7 @@
     "@nestjs/swagger": "^11.4.4",
     "dotenv": "^16.0.0",
     "fastify": "^4.0.0",
+    "jose": "^6.1.0",
     "pg": "^8.0.0"
   },
   "devDependencies": {
