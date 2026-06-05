@@ -15,6 +15,7 @@ services:
       - cloudbeaver
       - rabbitmq
       - minio
+      - tdengine
     restart: unless-stopped
 
   db:
@@ -98,6 +99,31 @@ services:
       - db
     restart: unless-stopped
 
+  tdengine:
+    build:
+      context: .
+      dockerfile: infra/tdengine/Dockerfile
+      args:
+        HTTP_PROXY: ${HTTP_PROXY:-http://host.docker.internal:7897}
+        HTTPS_PROXY: ${HTTPS_PROXY:-http://host.docker.internal:7897}
+        NO_PROXY: ${NO_PROXY:-localhost,127.0.0.1,db,factory-api,portal-ui,mobile-portal-ui,cockpit-ui,gateway,rabbitmq,redis,minio,cloudbeaver,tdengine,host.docker.internal}
+    environment:
+      HTTP_PROXY: ${HTTP_PROXY:-http://host.docker.internal:7897}
+      HTTPS_PROXY: ${HTTPS_PROXY:-http://host.docker.internal:7897}
+      NO_PROXY: ${NO_PROXY:-localhost,127.0.0.1,db,factory-api,portal-ui,mobile-portal-ui,cockpit-ui,gateway,rabbitmq,redis,minio,cloudbeaver,tdengine,host.docker.internal}
+      http_proxy: ${HTTP_PROXY:-http://host.docker.internal:7897}
+      https_proxy: ${HTTPS_PROXY:-http://host.docker.internal:7897}
+      no_proxy: ${NO_PROXY:-localhost,127.0.0.1,db,factory-api,portal-ui,mobile-portal-ui,cockpit-ui,gateway,rabbitmq,redis,minio,cloudbeaver,tdengine,host.docker.internal}
+    ports:
+      - "33712:6030"
+      - "33712:6030/udp"
+      - "33713:6041"
+      - "33714:6060"
+    volumes:
+      - tdengine-data:/var/lib/taos
+      - tdengine-log:/var/log/taos
+    restart: unless-stopped
+
   portal-ui:
     build:
       context: .
@@ -140,3 +166,5 @@ volumes:
   rabbitmq-data: {}
   minio-data: {}
   cloudbeaver-data: {}
+  tdengine-data: {}
+  tdengine-log: {}
