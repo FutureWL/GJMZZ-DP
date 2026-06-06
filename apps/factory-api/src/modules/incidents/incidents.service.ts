@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common'
-import type { Incident, IncidentStatus, IncidentType, Severity } from '@prisma/client'
+import type { Incident } from '@prisma/client'
 
 import { PrismaService } from '../prisma/prisma.service'
 import type { CreateIncidentBody, IncidentDto, UpdateIncidentBody } from './incidents.types'
@@ -73,9 +73,9 @@ export class IncidentsService {
         id,
         occurredAt: body.occurredAt,
         reportedBy: body.reportedBy,
-        type: body.type as unknown as IncidentType,
-        severity: body.severity as unknown as Severity,
-        status: (body.status ?? 'recording') as unknown as IncidentStatus,
+        type: body.type,
+        severity: body.severity,
+        status: body.status ?? 'recording',
         factoryId: body.factoryId,
         factoryName: body.factoryName,
         line: body.line ?? null,
@@ -100,9 +100,9 @@ export class IncidentsService {
       data: {
         occurredAt: body.occurredAt ?? undefined,
         reportedBy: body.reportedBy ?? undefined,
-        type: body.type ? (body.type as unknown as IncidentType) : undefined,
-        severity: body.severity ? (body.severity as unknown as Severity) : undefined,
-        status: body.status ? (body.status as unknown as IncidentStatus) : undefined,
+        type: body.type ?? undefined,
+        severity: body.severity ?? undefined,
+        status: body.status ?? undefined,
         factoryId: body.factoryId ?? undefined,
         factoryName: body.factoryName ?? undefined,
         line: body.line === undefined ? undefined : body.line ?? null,
@@ -122,4 +122,3 @@ export class IncidentsService {
     return this.update(id, { status: 'archived' })
   }
 }
-
