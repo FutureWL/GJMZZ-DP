@@ -2,6 +2,7 @@ import { Navigate, Route, Routes } from 'react-router-dom'
 import { AppLayout } from '../layout/AppLayout'
 import { SearchPage } from '../pages/SearchPage'
 import { PlaceholderPage } from '../pages/PlaceholderPage'
+import { WorkbenchPage } from '../pages/workbench/WorkbenchPage'
 import { BusinessDashboardPage } from '../pages/business/BusinessDashboardPage'
 import { ActivityListPage } from '../pages/business/crm/ActivityListPage'
 import { ContactDetailPage } from '../pages/business/crm/ContactDetailPage'
@@ -118,7 +119,7 @@ export function AppRoutes() {
         path="/"
         element={
           auth.isAuthenticated ? (
-            <Navigate to="/production/overview" replace />
+            <Navigate to="/workbench" replace />
           ) : (
             <Navigate to="/login" replace />
           )
@@ -127,151 +128,154 @@ export function AppRoutes() {
       <Route path="/login" element={<LoginPage />} />
 
       <Route element={<ProtectedRoute />}>
-        <Route path="/search" element={<SearchPage />} />
+        <Route element={<AppLayout portalId="main" />}>
+          <Route path="/workbench" element={<WorkbenchPage />} />
+          <Route path="/search" element={<SearchPage />} />
 
-        <Route path="/account" element={<AccountLayout />}>
-          <Route path="profile" element={<ProfilePage />} />
-          <Route path="security" element={<SecurityPage />} />
-          <Route path="roles" element={<RolesPage />} />
-          <Route path="sessions" element={<SessionsPage />} />
-          <Route path="*" element={<Navigate to="/account/profile" replace />} />
-        </Route>
+          <Route path="/account" element={<AccountLayout />}>
+            <Route path="profile" element={<ProfilePage />} />
+            <Route path="security" element={<SecurityPage />} />
+            <Route path="roles" element={<RolesPage />} />
+            <Route path="sessions" element={<SessionsPage />} />
+            <Route path="*" element={<Navigate to="/account/profile" replace />} />
+          </Route>
 
-        <Route path="/business" element={<AppLayout portalId="business" />}>
-          <Route path="dashboard" element={<BusinessDashboardPage />} />
-          <Route path="analysis" element={<PlaceholderPage title="经营分析（占位）" />} />
-          <Route path="sales" element={<PlaceholderPage title="客户与机会（占位）" />} />
-          <Route path="crm/guide" element={<CrmProcessGuidePage />} />
-          <Route path="crm/customers" element={<CustomerListPage />} />
-          <Route path="crm/customers/:id" element={<CustomerDetailPage />} />
-          <Route path="crm/opportunities" element={<OpportunityListPage />} />
-          <Route path="crm/opportunities/:id" element={<OpportunityDetailPage />} />
-          <Route path="crm/contacts" element={<ContactListPage />} />
-          <Route path="crm/contacts/:id" element={<ContactDetailPage />} />
-          <Route path="crm/activities" element={<ActivityListPage />} />
-          <Route path="crm/quotes" element={<QuoteListPage />} />
-          <Route path="crm/quotes/:id" element={<QuoteDetailPage />} />
-          <Route path="orders" element={<OrderListPage />} />
-          <Route path="orders/:id" element={<Order360DetailPage />} />
-          <Route path="*" element={<Navigate to="/business/dashboard" replace />} />
-        </Route>
+          <Route path="/business">
+            <Route path="dashboard" element={<BusinessDashboardPage />} />
+            <Route path="analysis" element={<PlaceholderPage title="经营分析（占位）" />} />
+            <Route path="sales" element={<PlaceholderPage title="客户与机会（占位）" />} />
+            <Route path="crm/guide" element={<CrmProcessGuidePage />} />
+            <Route path="crm/customers" element={<CustomerListPage />} />
+            <Route path="crm/customers/:id" element={<CustomerDetailPage />} />
+            <Route path="crm/opportunities" element={<OpportunityListPage />} />
+            <Route path="crm/opportunities/:id" element={<OpportunityDetailPage />} />
+            <Route path="crm/contacts" element={<ContactListPage />} />
+            <Route path="crm/contacts/:id" element={<ContactDetailPage />} />
+            <Route path="crm/activities" element={<ActivityListPage />} />
+            <Route path="crm/quotes" element={<QuoteListPage />} />
+            <Route path="crm/quotes/:id" element={<QuoteDetailPage />} />
+            <Route path="orders" element={<OrderListPage />} />
+            <Route path="orders/:id" element={<Order360DetailPage />} />
+            <Route path="*" element={<Navigate to="/business/dashboard" replace />} />
+          </Route>
 
-        <Route path="/management" element={<AppLayout portalId="management" />}>
-          <Route path="approval" element={<ApprovalCenterPage />} />
-          <Route path="approval/detail/:id" element={<ApprovalDetailPage />} />
-          <Route path="notifications" element={<NotificationCenterPage />} />
-          <Route path="audit/log" element={<AuditLogPage />} />
-          <Route path="security/permissions" element={<PermissionMatrixPage />} />
-          <Route path="expense/guide" element={<ExpenseFlowGuidePage />} />
-          <Route path="expense/claims/new" element={<ExpenseClaimNewPage />} />
-          <Route path="expense/claims/:id" element={<ExpenseClaimDetailPage />} />
-          <Route path="expense/dashboard" element={<ExpenseFlowDashboardPage />} />
-          <Route path="procurement/guide" element={<ProcurementGuidePage />} />
-          <Route path="procurement/pr/new" element={<ProcurementPRNewPage />} />
-          <Route path="procurement/pr" element={<ProcurementPRListPage />} />
-          <Route path="procurement/pr/:id" element={<ProcurementPRDetailPage />} />
-          <Route path="procurement/rfq/:id" element={<RFQDetailPage />} />
-          <Route path="procurement/po/:id" element={<PODetailPage />} />
-          <Route path="contract/guide" element={<ContractGuidePage />} />
-          <Route path="contract/reviews/new" element={<ContractReviewNewPage />} />
-          <Route path="contract/reviews/:id" element={<ContractReviewDetailPage />} />
-          <Route path="srm/suppliers" element={<SupplierListPage />} />
-          <Route path="srm/suppliers/:id" element={<SupplierDetailPage />} />
-          <Route path="erp/inventory" element={<InventoryListPage />} />
-          <Route path="erp/inventory/:id" element={<InventoryDetailPage />} />
-          <Route path="erp/expenses" element={<ExpenseListPage />} />
-          <Route path="erp/expenses/:id" element={<ExpenseDetailPage />} />
-          <Route path="erp/master-data" element={<MasterDataPage />} />
-          <Route path="outsourcing/factories" element={<PlaceholderPage title="外协工厂（占位）" />} />
-          <Route path="policy" element={<PlaceholderPage title="制度流程库（占位）" />} />
-          <Route path="audit" element={<PlaceholderPage title="内控审计（占位）" />} />
-          <Route path="kpi" element={<PlaceholderPage title="目标/KPI（占位）" />} />
-          <Route path="*" element={<Navigate to="/management/procurement/pr" replace />} />
-        </Route>
+          <Route path="/management">
+            <Route path="approval" element={<ApprovalCenterPage />} />
+            <Route path="approval/detail/:id" element={<ApprovalDetailPage />} />
+            <Route path="notifications" element={<NotificationCenterPage />} />
+            <Route path="audit/log" element={<AuditLogPage />} />
+            <Route path="security/permissions" element={<PermissionMatrixPage />} />
+            <Route path="expense/guide" element={<ExpenseFlowGuidePage />} />
+            <Route path="expense/claims/new" element={<ExpenseClaimNewPage />} />
+            <Route path="expense/claims/:id" element={<ExpenseClaimDetailPage />} />
+            <Route path="expense/dashboard" element={<ExpenseFlowDashboardPage />} />
+            <Route path="procurement/guide" element={<ProcurementGuidePage />} />
+            <Route path="procurement/pr/new" element={<ProcurementPRNewPage />} />
+            <Route path="procurement/pr" element={<ProcurementPRListPage />} />
+            <Route path="procurement/pr/:id" element={<ProcurementPRDetailPage />} />
+            <Route path="procurement/rfq/:id" element={<RFQDetailPage />} />
+            <Route path="procurement/po/:id" element={<PODetailPage />} />
+            <Route path="contract/guide" element={<ContractGuidePage />} />
+            <Route path="contract/reviews/new" element={<ContractReviewNewPage />} />
+            <Route path="contract/reviews/:id" element={<ContractReviewDetailPage />} />
+            <Route path="srm/suppliers" element={<SupplierListPage />} />
+            <Route path="srm/suppliers/:id" element={<SupplierDetailPage />} />
+            <Route path="erp/inventory" element={<InventoryListPage />} />
+            <Route path="erp/inventory/:id" element={<InventoryDetailPage />} />
+            <Route path="erp/expenses" element={<ExpenseListPage />} />
+            <Route path="erp/expenses/:id" element={<ExpenseDetailPage />} />
+            <Route path="erp/master-data" element={<MasterDataPage />} />
+            <Route path="outsourcing/factories" element={<PlaceholderPage title="外协工厂（占位）" />} />
+            <Route path="policy" element={<PlaceholderPage title="制度流程库（占位）" />} />
+            <Route path="audit" element={<PlaceholderPage title="内控审计（占位）" />} />
+            <Route path="kpi" element={<PlaceholderPage title="目标/KPI（占位）" />} />
+            <Route path="*" element={<Navigate to="/management/procurement/pr" replace />} />
+          </Route>
 
-        <Route path="/production" element={<AppLayout portalId="production" />}>
-          <Route path="overview" element={<ProductionOverviewPage />} />
-          <Route path="meeting" element={<MorningMeetingGroupPage />} />
-          <Route path="meeting/factories/:factoryId" element={<MorningMeetingFactoryPage />} />
-          <Route path="meeting/risks/:id" element={<MorningMeetingRiskDetailPage />} />
-          <Route path="delivery/overview" element={<DeliveryRiskOverviewPage />} />
-          <Route path="delivery/material-shortage" element={<MaterialShortagePage />} />
-          <Route path="delivery/bottlenecks" element={<BottlenecksPage />} />
-          <Route path="delivery/quality-holds" element={<QualityHoldsPage />} />
-          <Route path="risks" element={<RiskListPage />} />
-          <Route path="risks/:riskId" element={<RiskDetailPage />} />
-          <Route path="alarms" element={<AlarmCenterPage />} />
-          <Route path="incidents" element={<IncidentListPage />} />
-          <Route path="incidents/new" element={<IncidentUpsertPage mode="create" />} />
-          <Route path="incidents/:id" element={<IncidentDetailPage />} />
-          <Route path="incidents/:id/edit" element={<IncidentUpsertPage mode="edit" />} />
-          <Route path="mes/dispatch" element={<DispatchListPage />} />
-          <Route path="mes/report" element={<ReportPage />} />
-          <Route path="mes/quality" element={<QualityTaskListPage />} />
-          <Route path="mes/quality/:id" element={<QualityTaskDetailPage />} />
-          <Route path="workorders" element={<WorkOrderListPage />} />
-          <Route path="workorders/:id" element={<WorkOrderDetailPage />} />
-          <Route path="schedule" element={<PlaceholderPage title="排程（占位）" />} />
-          <Route path="trace" element={<TracePage />} />
-          <Route path="equipment" element={<PlaceholderPage title="设备监控（占位）" />} />
-          <Route path="maintenance/guide" element={<MaintenanceGuidePage />} />
-          <Route path="maintenance/new" element={<MaintenanceTicketNewPage />} />
-          <Route path="maintenance/dashboard" element={<MaintenanceDashboardPage />} />
-          <Route path="maintenance" element={<MaintenanceTicketListPage />} />
-          <Route path="maintenance/:id" element={<MaintenanceTicketDetailPage />} />
-          <Route path="*" element={<Navigate to="/production/overview" replace />} />
-        </Route>
+          <Route path="/production">
+            <Route path="overview" element={<ProductionOverviewPage />} />
+            <Route path="meeting" element={<MorningMeetingGroupPage />} />
+            <Route path="meeting/factories/:factoryId" element={<MorningMeetingFactoryPage />} />
+            <Route path="meeting/risks/:id" element={<MorningMeetingRiskDetailPage />} />
+            <Route path="delivery/overview" element={<DeliveryRiskOverviewPage />} />
+            <Route path="delivery/material-shortage" element={<MaterialShortagePage />} />
+            <Route path="delivery/bottlenecks" element={<BottlenecksPage />} />
+            <Route path="delivery/quality-holds" element={<QualityHoldsPage />} />
+            <Route path="risks" element={<RiskListPage />} />
+            <Route path="risks/:riskId" element={<RiskDetailPage />} />
+            <Route path="alarms" element={<AlarmCenterPage />} />
+            <Route path="incidents" element={<IncidentListPage />} />
+            <Route path="incidents/new" element={<IncidentUpsertPage mode="create" />} />
+            <Route path="incidents/:id" element={<IncidentDetailPage />} />
+            <Route path="incidents/:id/edit" element={<IncidentUpsertPage mode="edit" />} />
+            <Route path="mes/dispatch" element={<DispatchListPage />} />
+            <Route path="mes/report" element={<ReportPage />} />
+            <Route path="mes/quality" element={<QualityTaskListPage />} />
+            <Route path="mes/quality/:id" element={<QualityTaskDetailPage />} />
+            <Route path="workorders" element={<WorkOrderListPage />} />
+            <Route path="workorders/:id" element={<WorkOrderDetailPage />} />
+            <Route path="schedule" element={<PlaceholderPage title="排程（占位）" />} />
+            <Route path="trace" element={<TracePage />} />
+            <Route path="equipment" element={<PlaceholderPage title="设备监控（占位）" />} />
+            <Route path="maintenance/guide" element={<MaintenanceGuidePage />} />
+            <Route path="maintenance/new" element={<MaintenanceTicketNewPage />} />
+            <Route path="maintenance/dashboard" element={<MaintenanceDashboardPage />} />
+            <Route path="maintenance" element={<MaintenanceTicketListPage />} />
+            <Route path="maintenance/:id" element={<MaintenanceTicketDetailPage />} />
+            <Route path="*" element={<Navigate to="/production/overview" replace />} />
+          </Route>
 
-        <Route path="/support" element={<AppLayout portalId="support" />}>
-          <Route path="home" element={<SupportHomePage />} />
-          <Route path="tickets" element={<SupportTicketListPage />} />
-          <Route path="tickets/:id" element={<SupportTicketDetailPage />} />
-          <Route path="requests" element={<SupportRequestListPage />} />
-          <Route path="requests/:id" element={<SupportRequestDetailPage />} />
-          <Route path="notices" element={<SupportAnnouncementPage />} />
-          <Route path="kb" element={<SupportKnowledgeBasePage />} />
-          <Route path="it/tickets" element={<ItTicketListPage />} />
-          <Route path="it/tickets/:id" element={<ItTicketDetailPage />} />
-          <Route path="hr" element={<PlaceholderPage title="人事（占位）" />} />
-          <Route path="finance" element={<PlaceholderPage title="财务（占位）" />} />
-          <Route path="qms" element={<PlaceholderPage title="体系（占位）" />} />
-          <Route path="security" element={<PlaceholderPage title="安保（占位）" />} />
-          <Route path="data-security" element={<PlaceholderPage title="数据安全（占位）" />} />
-          <Route path="ehs" element={<PlaceholderPage title="安全环保（占位）" />} />
-          <Route path="*" element={<Navigate to="/support/home" replace />} />
-        </Route>
+          <Route path="/support">
+            <Route path="home" element={<SupportHomePage />} />
+            <Route path="tickets" element={<SupportTicketListPage />} />
+            <Route path="tickets/:id" element={<SupportTicketDetailPage />} />
+            <Route path="requests" element={<SupportRequestListPage />} />
+            <Route path="requests/:id" element={<SupportRequestDetailPage />} />
+            <Route path="notices" element={<SupportAnnouncementPage />} />
+            <Route path="kb" element={<SupportKnowledgeBasePage />} />
+            <Route path="it/tickets" element={<ItTicketListPage />} />
+            <Route path="it/tickets/:id" element={<ItTicketDetailPage />} />
+            <Route path="hr" element={<PlaceholderPage title="人事（占位）" />} />
+            <Route path="finance" element={<PlaceholderPage title="财务（占位）" />} />
+            <Route path="qms" element={<PlaceholderPage title="体系（占位）" />} />
+            <Route path="security" element={<PlaceholderPage title="安保（占位）" />} />
+            <Route path="data-security" element={<PlaceholderPage title="数据安全（占位）" />} />
+            <Route path="ehs" element={<PlaceholderPage title="安全环保（占位）" />} />
+            <Route path="*" element={<Navigate to="/support/home" replace />} />
+          </Route>
 
-        <Route path="/additional" element={<AppLayout portalId="additional" />}>
-          <Route path="home" element={<AdditionalHomePage />} />
-          <Route path="requests" element={<AdditionalRequestsPage />} />
-          <Route path="requests/:id" element={<AdditionalRequestDetailPage />} />
-          <Route path="admin" element={<AdditionalGlobalAdminHomePage />} />
-          <Route path="admin/centers" element={<AdditionalGlobalAdminCentersPage />} />
-          <Route path="admin/services" element={<AdditionalGlobalAdminServicesPage />} />
-          <Route path="admin/requests" element={<AdditionalGlobalAdminRequestsPage />} />
-          <Route path="admin/contents" element={<AdditionalGlobalAdminContentsPage />} />
-          <Route path="admin/permissions" element={<AdditionalGlobalAdminPermissionsPage />} />
-          <Route path="prototypes" element={<PrototypeHubPage />} />
-          <Route path="prototypes/mobile-portal" element={<MobilePortalPrototypePage />} />
-          <Route path="prototypes/mobile-crm" element={<MobileCrmPrototypePage />} />
-          <Route path="prototypes/tv-wallboard" element={<TvWallboardPrototypePage />} />
-          <Route path="prototypes/cockpit" element={<CockpitPrototypePage />} />
-          <Route path=":center" element={<AdditionalCenterPage />} />
-          <Route path=":center/services" element={<AdditionalServiceListPage />} />
-          <Route path=":center/services/:serviceId" element={<AdditionalServiceDetailPage />} />
-          <Route path=":center/apply/:serviceId" element={<AdditionalApplyPage />} />
-          <Route path=":center/requests" element={<AdditionalRequestsPage />} />
-          <Route path=":center/content/:type" element={<AdditionalContentListPage />} />
-          <Route path=":center/admin" element={<AdditionalAdminHomePage />} />
-          <Route path=":center/admin/services" element={<AdditionalAdminServicesPage />} />
-          <Route path=":center/admin/requests" element={<AdditionalAdminRequestsPage />} />
-          <Route path=":center/admin/contents" element={<AdditionalAdminContentsPage />} />
-          <Route path=":center/admin/permissions" element={<AdditionalAdminPermissionsPage />} />
-          <Route path="*" element={<Navigate to="/additional/home" replace />} />
+          <Route path="/additional">
+            <Route path="home" element={<AdditionalHomePage />} />
+            <Route path="requests" element={<AdditionalRequestsPage />} />
+            <Route path="requests/:id" element={<AdditionalRequestDetailPage />} />
+            <Route path="admin" element={<AdditionalGlobalAdminHomePage />} />
+            <Route path="admin/centers" element={<AdditionalGlobalAdminCentersPage />} />
+            <Route path="admin/services" element={<AdditionalGlobalAdminServicesPage />} />
+            <Route path="admin/requests" element={<AdditionalGlobalAdminRequestsPage />} />
+            <Route path="admin/contents" element={<AdditionalGlobalAdminContentsPage />} />
+            <Route path="admin/permissions" element={<AdditionalGlobalAdminPermissionsPage />} />
+            <Route path="prototypes" element={<PrototypeHubPage />} />
+            <Route path="prototypes/mobile-portal" element={<MobilePortalPrototypePage />} />
+            <Route path="prototypes/mobile-crm" element={<MobileCrmPrototypePage />} />
+            <Route path="prototypes/tv-wallboard" element={<TvWallboardPrototypePage />} />
+            <Route path="prototypes/cockpit" element={<CockpitPrototypePage />} />
+            <Route path=":center" element={<AdditionalCenterPage />} />
+            <Route path=":center/services" element={<AdditionalServiceListPage />} />
+            <Route path=":center/services/:serviceId" element={<AdditionalServiceDetailPage />} />
+            <Route path=":center/apply/:serviceId" element={<AdditionalApplyPage />} />
+            <Route path=":center/requests" element={<AdditionalRequestsPage />} />
+            <Route path=":center/content/:type" element={<AdditionalContentListPage />} />
+            <Route path=":center/admin" element={<AdditionalAdminHomePage />} />
+            <Route path=":center/admin/services" element={<AdditionalAdminServicesPage />} />
+            <Route path=":center/admin/requests" element={<AdditionalAdminRequestsPage />} />
+            <Route path=":center/admin/contents" element={<AdditionalAdminContentsPage />} />
+            <Route path=":center/admin/permissions" element={<AdditionalAdminPermissionsPage />} />
+            <Route path="*" element={<Navigate to="/additional/home" replace />} />
+          </Route>
         </Route>
       </Route>
 
-      <Route path="*" element={<Navigate to="/production/overview" replace />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )
 }

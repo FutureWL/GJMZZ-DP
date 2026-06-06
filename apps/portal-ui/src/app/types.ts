@@ -1,4 +1,4 @@
-export type PortalId = 'business' | 'management' | 'production' | 'support' | 'additional'
+export type PortalId = 'main'
 
 export type OrgScopeType = 'group' | 'factory' | 'department' | 'line'
 
@@ -7,4 +7,3 @@ export interface OrgScope {
   id: string
   name: string
 }
-

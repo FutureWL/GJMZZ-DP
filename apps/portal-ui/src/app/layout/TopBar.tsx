@@ -1,8 +1,7 @@
 import { LogOut, Maximize, Minimize, Moon, Settings, Shield, Search, Sun, User } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
-import { PORTALS } from '../config/portals'
-import type { OrgScope, PortalId } from '../types'
+import { useNavigate } from 'react-router-dom'
+import type { OrgScope } from '../types'
 import { useOrgScope } from '../state/useOrgScope'
 import { useAuth } from '../state/auth/useAuth'
 import { useTheme } from '../state/useTheme'
@@ -12,7 +11,6 @@ import { Avatar } from '../ui/Avatar'
 import { Menu, MenuItem } from '../ui/Menu'
 import { Select } from '../ui/Select'
 import { ProductMark } from '../ui/ProductMark'
-import { getPortalFromPathname } from '../utils/portal'
 
 const ORG_OPTIONS: OrgScope[] = [
   { type: 'group', id: 'G001', name: '集团' },
@@ -38,9 +36,6 @@ export function TopBar() {
   const [openUserMenu, setOpenUserMenu] = useState(false)
   const [isFullscreen, setIsFullscreen] = useState(false)
   const nav = useNavigate()
-  const loc = useLocation()
-
-  const portalId = useMemo<PortalId>(() => getPortalFromPathname(loc.pathname), [loc.pathname])
 
   const fullscreenSupported = useMemo(() => {
     if (typeof document === 'undefined') return false
@@ -96,21 +91,6 @@ export function TopBar() {
     <header className="flex h-14 items-center gap-3 border-b border-[var(--color-border-subtle)] bg-[var(--color-bg-surface)] px-4">
       <ProductMark />
       <div className="flex items-center gap-2">
-        <Select
-          className="w-[120px]"
-          value={portalId}
-          onChange={(e) => {
-            const next = e.target.value as PortalId
-            const portal = PORTALS.find((p) => p.id === next)
-            nav(portal?.defaultPath ?? '/production/overview')
-          }}
-        >
-          {PORTALS.map((p) => (
-            <option key={p.id} value={p.id}>
-              {p.label}门户
-            </option>
-          ))}
-        </Select>
         <Select
           className="w-[140px]"
           value={scope.id}
