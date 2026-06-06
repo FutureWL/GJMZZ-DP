@@ -14,8 +14,9 @@ Add this entry to your `C:\Windows\System32\drivers\etc\hosts`:
 
 From this folder:
 
-- Copy `.env.example` to `.env`
-- Run `docker compose --env-file .env up -d`
+- Copy root `.env.example` to root `.env` (if not exists)
+- Ensure the root `docker-compose.yml` Postgres (`33705`) is running
+- Run `docker compose --env-file ../../.env up -d`
 
 ## Realm (auto import)
 
@@ -32,4 +33,4 @@ From this folder:
 
 ## Stop
 
-- Run `docker compose --env-file .env down`
+- Run `docker compose --env-file ../../.env down`

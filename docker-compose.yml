@@ -35,6 +35,52 @@ services:
       timeout: 3s
       retries: 20
 
+  db-init-keycloak:
+    image: postgres:16-alpine
+    environment:
+      PGHOST: db
+      PGPORT: 5432
+      PGUSER: factory
+      PGPASSWORD: factory
+    depends_on:
+      db:
+        condition: service_healthy
+    entrypoint:
+      [
+        "sh",
+        "-lc",
+        "set -euo pipefail; psql -d postgres -tc \"SELECT 1 FROM pg_roles WHERE rolname='keycloak'\" | grep -q 1 || psql -d postgres -c \"CREATE ROLE keycloak LOGIN PASSWORD 'keycloak'\"; psql -d postgres -tc \"SELECT 1 FROM pg_database WHERE datname='keycloak'\" | grep -q 1 || psql -d postgres -c \"CREATE DATABASE keycloak OWNER keycloak\"",
+      ]
+    restart: "no"
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.0.5
+    command: ["start-dev", "--http-port=8080", "--import-realm"]
+    environment:
+      KC_DB: postgres
+      KC_DB_URL_HOST: db
+      KC_DB_URL_PORT: 5432
+      KC_DB_URL_DATABASE: keycloak
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: keycloak
+      KC_BOOTSTRAP_ADMIN_USERNAME: ${KC_ADMIN_USERNAME:-admin}
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KC_ADMIN_PASSWORD:-admin}
+      KC_HTTP_ENABLED: "true"
+      KC_HOSTNAME: ${KC_HOSTNAME:-sso.corp.aygjm.lan}
+      KC_HOSTNAME_STRICT: "false"
+      KC_PROXY_HEADERS: "xforwarded"
+    ports:
+      - "18080:8080"
+    volumes:
+      - ./data/keycloak:/opt/keycloak/data
+      - ./infra/compose/sso-dev/realm:/opt/keycloak/data/import:ro
+    depends_on:
+      db:
+        condition: service_healthy
+      db-init-keycloak:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
   factory-api:
     build:
       context: .
@@ -102,6 +148,11 @@ services:
 
   cloudbeaver:
     image: dbeaver/cloudbeaver:latest
+    environment:
+      CB_SERVER_NAME: ${CB_SERVER_NAME:-Factory CloudBeaver}
+      CB_SERVER_URL: ${CB_SERVER_URL:-http://localhost:33706/}
+      CB_ADMIN_NAME: ${CB_ADMIN_NAME:-cbadmin}
+      CB_ADMIN_PASSWORD: ${CB_ADMIN_PASSWORD:-cbadmin}
     ports:
       - "33706:8978"
     volumes:
