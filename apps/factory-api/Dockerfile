@@ -16,8 +16,10 @@ FROM base AS deps
 
 COPY pnpm-workspace.yaml package.json pnpm-lock.yaml ./
 COPY apps/factory-api/package.json apps/factory-api/package.json
+COPY apps/factory-api/prisma apps/factory-api/prisma
 
 RUN pnpm install --filter factory-api... --frozen-lockfile
+RUN pnpm --filter factory-api exec prisma generate
 
 FROM deps AS build
 

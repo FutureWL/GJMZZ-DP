@@ -20,7 +20,7 @@ function formatAt(now = new Date()) {
 export function IncidentUpsertPage({ mode }: { mode: 'create' | 'edit' }) {
   const { id } = useParams()
   const navigate = useNavigate()
-  const { incidents, createIncident, updateIncident } = useIncidentData()
+  const { incidents, isLoading, createIncident, updateIncident } = useIncidentData()
 
   const editing = useMemo(() => (mode === 'edit' ? incidents.find((x) => x.id === id) : null), [id, incidents, mode])
 
@@ -36,10 +36,11 @@ export function IncidentUpsertPage({ mode }: { mode: 'create' | 'edit' }) {
   const [material, setMaterial] = useState<string>(() => editing?.material ?? '')
   const [description, setDescription] = useState<string>(() => editing?.description ?? '')
   const [attachments, setAttachments] = useState<string>(() => (editing?.attachments ?? []).join(', '))
+  const [saving, setSaving] = useState(false)
 
   const factoryName = factories.find((f) => f.id === factoryId)?.name ?? factoryId
 
-  if (mode === 'edit' && !editing) {
+  if (mode === 'edit' && !editing && !isLoading) {
     return <Navigate to="/production/incidents" replace />
   }
 
@@ -161,50 +162,55 @@ export function IncidentUpsertPage({ mode }: { mode: 'create' | 'edit' }) {
             <Button
               variant="primary"
               disabled={!description.trim()}
-              onClick={() => {
-                if (mode === 'create') {
-                  const created = createIncident({
-                    occurredAt,
-                    reportedBy: reportedBy.trim() || '未填',
-                    type,
-                    severity,
-                    status: 'recording',
-                    factoryId,
-                    factoryName,
-                    line: line.trim() || undefined,
-                    workOrderId: workOrderId.trim() || undefined,
-                    orderId: orderId.trim() || undefined,
-                    equipment: equipment.trim() || undefined,
-                    material: material.trim() || undefined,
-                    description: description.trim(),
-                    attachments: attachments
-                      .split(',')
-                      .map((x) => x.trim())
-                      .filter(Boolean),
-                  })
-                  navigate(`/production/incidents/${encodeURIComponent(created.id)}`)
-                } else if (editing) {
-                  updateIncident({
-                    ...editing,
-                    occurredAt,
-                    reportedBy: reportedBy.trim() || '未填',
-                    type,
-                    severity,
-                    factoryId,
-                    factoryName,
-                    line: line.trim() || undefined,
-                    workOrderId: workOrderId.trim() || undefined,
-                    orderId: orderId.trim() || undefined,
-                    equipment: equipment.trim() || undefined,
-                    material: material.trim() || undefined,
-                    description: description.trim(),
-                    attachments: attachments
-                      .split(',')
-                      .map((x) => x.trim())
-                      .filter(Boolean),
-                    updatedAt: formatAt(),
-                  })
-                  navigate(`/production/incidents/${encodeURIComponent(editing.id)}`)
+              onClick={async () => {
+                if (saving) return
+                setSaving(true)
+                try {
+                  if (mode === 'create') {
+                    const created = await createIncident({
+                      occurredAt,
+                      reportedBy: reportedBy.trim() || '未填',
+                      type,
+                      severity,
+                      status: 'recording',
+                      factoryId,
+                      factoryName,
+                      line: line.trim() || undefined,
+                      workOrderId: workOrderId.trim() || undefined,
+                      orderId: orderId.trim() || undefined,
+                      equipment: equipment.trim() || undefined,
+                      material: material.trim() || undefined,
+                      description: description.trim(),
+                      attachments: attachments
+                        .split(',')
+                        .map((x) => x.trim())
+                        .filter(Boolean),
+                    })
+                    navigate(`/production/incidents/${encodeURIComponent(created.id)}`)
+                  } else if (editing) {
+                    await updateIncident({
+                      ...editing,
+                      occurredAt,
+                      reportedBy: reportedBy.trim() || '未填',
+                      type,
+                      severity,
+                      factoryId,
+                      factoryName,
+                      line: line.trim() || undefined,
+                      workOrderId: workOrderId.trim() || undefined,
+                      orderId: orderId.trim() || undefined,
+                      equipment: equipment.trim() || undefined,
+                      material: material.trim() || undefined,
+                      description: description.trim(),
+                      attachments: attachments
+                        .split(',')
+                        .map((x) => x.trim())
+                        .filter(Boolean),
+                    })
+                    navigate(`/production/incidents/${encodeURIComponent(editing.id)}`)
+                  }
+                } finally {
+                  setSaving(false)
                 }
               }}
             >
@@ -216,4 +222,3 @@ export function IncidentUpsertPage({ mode }: { mode: 'create' | 'edit' }) {
     </div>
   )
 }
-

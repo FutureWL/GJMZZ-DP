@@ -24,7 +24,7 @@ const typeLabel: Record<Incident['type'], string> = {
 
 export function IncidentDetailPage() {
   const { id } = useParams()
-  const { incidents, archiveIncident } = useIncidentData()
+  const { incidents, isLoading, archiveIncident } = useIncidentData()
   const incident = incidents.find((x) => x.id === id)
 
   return (
@@ -54,7 +54,7 @@ export function IncidentDetailPage() {
       {!incident ? (
         <Card>
           <CardBody>
-            <div className="text-sm text-[var(--color-text-tertiary)]">未找到该异常。</div>
+            <div className="text-sm text-[var(--color-text-tertiary)]">{isLoading ? '加载中…' : '未找到该异常。'}</div>
             <div className="mt-3">
               <Link className="text-sm text-[var(--color-primary)] hover:underline" to="/production/incidents">
                 返回异常中心
@@ -166,4 +166,3 @@ export function IncidentDetailPage() {
     </div>
   )
 }
-

@@ -23,7 +23,7 @@ export function ProfilePage() {
     <div>
       <PageHeader
         title="个人信息"
-        description="基础信息展示与编辑（保存到 LocalStorage）"
+        description="基础信息展示与编辑（数据持久化到数据库）"
         right={
           editing ? (
             <div className="flex items-center gap-2">

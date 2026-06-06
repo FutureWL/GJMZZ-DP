@@ -1,0 +1,52 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Severity {
+  critical
+  high
+  medium
+  low
+}
+
+enum IncidentType {
+  quality
+  equipment
+  material_shortage
+  plan
+  safety
+  other
+}
+
+enum IncidentStatus {
+  recording
+  archived
+}
+
+model Incident {
+  id          String         @id
+  occurredAt  String         @map("occurred_at")
+  reportedBy  String         @map("reported_by")
+  type        IncidentType
+  severity    Severity
+  status      IncidentStatus
+  factoryId   String         @map("factory_id")
+  factoryName String         @map("factory_name")
+  line        String?
+  workOrderId String?        @map("work_order_id")
+  orderId     String?        @map("order_id")
+  equipment   String?
+  material    String?
+  description String
+  attachments String[]
+  createdAt   String         @map("created_at")
+  updatedAt   String         @map("updated_at")
+
+  @@map("incident")
+}
+

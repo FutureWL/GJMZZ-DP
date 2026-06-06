@@ -1,5 +1,6 @@
-import { createContext, useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
+import { createContext, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import type { AuthState, User } from './types'
+import { apiGet, apiPut } from '../../api/client'
 import { keycloak } from './keycloak'
 
 export interface AuthContextValue {
@@ -21,6 +22,17 @@ function buildRedirectUri(nextPath?: string) {
   const normalizedNext = (nextPath ?? '/').startsWith('/') ? (nextPath ?? '/') : `/${nextPath}`
   const rel = normalizedNext === '/' ? '' : normalizedNext.slice(1)
   return `${window.location.origin}${normalizedBase}${rel}`
+}
+
+interface ProfileResponse {
+  user_id: string
+  name: string
+  employee_id: string
+  department: string
+  position: string
+  phone: string
+  email: string
+  avatar_text: string
 }
 
 function buildUserFromToken(tokenParsed: Record<string, unknown>): User {
@@ -52,30 +64,56 @@ function buildUserFromToken(tokenParsed: Record<string, unknown>): User {
   }
 }
 
+function mergeUserWithProfile(tokenUser: User, profile: ProfileResponse | null): User {
+  if (!profile) return tokenUser
+  return {
+    ...tokenUser,
+    name: profile.name || tokenUser.name,
+    employeeId: profile.employee_id || tokenUser.employeeId,
+    department: profile.department || tokenUser.department,
+    position: profile.position || tokenUser.position,
+    phone: profile.phone || tokenUser.phone,
+    email: profile.email || tokenUser.email,
+    avatarText: profile.avatar_text || tokenUser.avatarText,
+  }
+}
+
+async function fetchProfile(token: string): Promise<ProfileResponse | null> {
+  try {
+    return await apiGet<ProfileResponse | null>('/profiles/me', token)
+  } catch {
+    return null
+  }
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<AuthState | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const fetchingRef = useRef(false)
 
   useEffect(() => {
     let mounted = true
-    keycloak
-      .init({
-        onLoad: 'check-sso',
-        pkceMethod: 'S256',
-        checkLoginIframe: false,
-      })
-      .then((authenticated) => {
+    ;(async () => {
+      try {
+        const authenticated = await keycloak.init({
+          onLoad: 'check-sso',
+          pkceMethod: 'S256',
+          checkLoginIframe: false,
+        })
         if (!mounted) return
         if (authenticated && keycloak.token && keycloak.tokenParsed) {
-          setState({ token: keycloak.token, user: buildUserFromToken(keycloak.tokenParsed as Record<string, unknown>) })
+          const tokenUser = buildUserFromToken(keycloak.tokenParsed as Record<string, unknown>)
+          const profile = await fetchProfile(keycloak.token)
+          setState({ token: keycloak.token, user: mergeUserWithProfile(tokenUser, profile) })
         } else {
           setState(null)
         }
-      })
-      .finally(() => {
-        if (!mounted) return
-        setIsLoading(false)
-      })
+      } catch {
+        if (mounted) setState(null)
+      } finally {
+        if (mounted) setIsLoading(false)
+      }
+    })()
     return () => {
       mounted = false
     }
@@ -86,10 +124,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const id = window.setInterval(() => {
       keycloak
         .updateToken(30)
-        .then((refreshed) => {
+        .then(async (refreshed) => {
           if (!refreshed) return
-          if (!keycloak.token || !keycloak.tokenParsed) return
-          setState({ token: keycloak.token, user: buildUserFromToken(keycloak.tokenParsed as Record<string, unknown>) })
+          if (fetchingRef.current) return
+          fetchingRef.current = true
+          try {
+            const token = keycloak.token
+            const tokenParsed = keycloak.tokenParsed
+            if (!token || !tokenParsed) return
+            const tokenUser = buildUserFromToken(tokenParsed as Record<string, unknown>)
+            const profile = await fetchProfile(token)
+            setState({ token, user: mergeUserWithProfile(tokenUser, profile) })
+          } finally {
+            fetchingRef.current = false
+          }
         })
         .catch(() => {})
     }, 10_000)
@@ -114,13 +162,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     keycloak.logout({ redirectUri: buildRedirectUri('/login') }).catch(() => {})
   }, [])
 
-  const updateUser = useCallback((user: User) => {
-    setState((prev) => {
-      if (!prev) return prev
-      const next: AuthState = { ...prev, user }
-      return next
-    })
-  }, [])
+  const updateUser = useCallback(
+    async (user: User) => {
+      const currentToken = keycloak.token
+      if (!currentToken) return
+      try {
+        await apiPut('/profiles/me', currentToken, {
+          name: user.name,
+          employee_id: user.employeeId,
+          department: user.department,
+          position: user.position,
+          phone: user.phone,
+          email: user.email,
+          avatar_text: user.avatarText,
+        })
+      } catch {
+      }
+      setState((prev) => {
+        if (!prev) return prev
+        return { ...prev, user }
+      })
+    },
+    [],
+  )
 
   const value = useMemo<AuthContextValue>(
     () => ({
