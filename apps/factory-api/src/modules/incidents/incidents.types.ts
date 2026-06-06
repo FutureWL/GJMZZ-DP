@@ -29,3 +29,22 @@ export type CreateIncidentBody = Omit<IncidentDto, 'id' | 'createdAt' | 'updated
 export type UpdateIncidentBody = Partial<Omit<IncidentDto, 'id' | 'createdAt' | 'updatedAt' | 'status'>> & {
   status?: IncidentStatus
 }
+
+export type IncidentListQuery = {
+  page?: number
+  pageSize?: number
+  factoryId?: string
+  type?: IncidentType
+  severity?: Severity
+  status?: IncidentStatus
+  keyword?: string
+  occurredFrom?: string
+  occurredTo?: string
+}
+
+export type IncidentPageResult = {
+  page: number
+  pageSize: number
+  total: number
+  items: IncidentDto[]
+}

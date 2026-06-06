@@ -1,6 +1,15 @@
-import { BadRequestException, Body, Controller, Get, NotFoundException, Param, Post, Put } from '@nestjs/common'
+import { BadRequestException, Body, Controller, Get, NotFoundException, Param, Post, Put, Query } from '@nestjs/common'
 
-import type { CreateIncidentBody, IncidentDto, IncidentStatus, IncidentType, Severity, UpdateIncidentBody } from './incidents.types'
+import type {
+  CreateIncidentBody,
+  IncidentDto,
+  IncidentListQuery,
+  IncidentPageResult,
+  IncidentStatus,
+  IncidentType,
+  Severity,
+  UpdateIncidentBody,
+} from './incidents.types'
 import { IncidentsService } from './incidents.service'
 
 const TYPE_SET: ReadonlySet<IncidentType> = new Set(['quality', 'equipment', 'material_shortage', 'plan', 'safety', 'other'])
@@ -96,6 +105,30 @@ function parseUpdateBody(body: unknown): UpdateIncidentBody {
   return next
 }
 
+function parsePositiveInt(v: unknown, field: string): number | undefined {
+  if (v === undefined) return undefined
+  const n = typeof v === 'string' ? Number(v) : typeof v === 'number' ? v : NaN
+  if (!Number.isFinite(n) || n <= 0 || Math.floor(n) !== n) {
+    throw new BadRequestException(`${field} must be positive integer`)
+  }
+  return n
+}
+
+function parseQuery(query: Record<string, unknown>): IncidentListQuery {
+  const next: IncidentListQuery = {}
+  if (query.page !== undefined) next.page = parsePositiveInt(query.page, 'page')
+  if (query.pageSize !== undefined) next.pageSize = parsePositiveInt(query.pageSize, 'pageSize')
+
+  if (typeof query.factoryId === 'string' && query.factoryId.trim()) next.factoryId = query.factoryId.trim()
+  if (query.type !== undefined) next.type = parseType(query.type)
+  if (query.severity !== undefined) next.severity = parseSeverity(query.severity)
+  if (query.status !== undefined) next.status = parseStatus(query.status)
+  if (typeof query.keyword === 'string' && query.keyword.trim()) next.keyword = query.keyword.trim()
+  if (typeof query.occurredFrom === 'string' && query.occurredFrom.trim()) next.occurredFrom = query.occurredFrom.trim()
+  if (typeof query.occurredTo === 'string' && query.occurredTo.trim()) next.occurredTo = query.occurredTo.trim()
+  return next
+}
+
 @Controller('incidents')
 export class IncidentsController {
   constructor(private readonly incidents: IncidentsService) {}
@@ -103,6 +136,12 @@ export class IncidentsController {
   @Get()
   async list(): Promise<IncidentDto[]> {
     return this.incidents.list()
+  }
+
+  @Get('page')
+  async page(@Query() query: Record<string, unknown>): Promise<IncidentPageResult> {
+    const parsed = parseQuery(query)
+    return this.incidents.listPaged(parsed)
   }
 
   @Get(':id')

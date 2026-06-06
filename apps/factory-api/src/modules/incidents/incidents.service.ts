@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common'
-import type { Incident } from '@prisma/client'
+import type { Incident, Prisma } from '@prisma/client'
 
 import { PrismaService } from '../prisma/prisma.service'
-import type { CreateIncidentBody, IncidentDto, UpdateIncidentBody } from './incidents.types'
+import type { CreateIncidentBody, IncidentDto, IncidentListQuery, IncidentPageResult, UpdateIncidentBody } from './incidents.types'
 
 function pad2(n: number) {
   return String(n).padStart(2, '0')
@@ -56,6 +56,54 @@ export class IncidentsService {
       orderBy: [{ updatedAt: 'desc' }, { id: 'desc' }],
     })
     return rows.map(toDto)
+  }
+
+  async listPaged(query: IncidentListQuery): Promise<IncidentPageResult> {
+    const page = Number.isFinite(query.page) && (query.page as number) > 0 ? (query.page as number) : 1
+    const pageSizeRaw =
+      Number.isFinite(query.pageSize) && (query.pageSize as number) > 0 ? (query.pageSize as number) : 20
+    const pageSize = Math.min(pageSizeRaw, 100)
+    const skip = (page - 1) * pageSize
+
+    const where: Prisma.IncidentWhereInput = {}
+    if (query.factoryId) where.factoryId = query.factoryId
+    if (query.type) where.type = query.type
+    if (query.severity) where.severity = query.severity
+    if (query.status) where.status = query.status
+    if (query.occurredFrom || query.occurredTo) {
+      where.occurredAt = {
+        ...(query.occurredFrom ? { gte: query.occurredFrom } : {}),
+        ...(query.occurredTo ? { lte: query.occurredTo } : {}),
+      }
+    }
+    if (query.keyword) {
+      const kw = query.keyword.trim()
+      if (kw) {
+        where.OR = [
+          { id: { contains: kw, mode: 'insensitive' } },
+          { factoryName: { contains: kw, mode: 'insensitive' } },
+          { line: { contains: kw, mode: 'insensitive' } },
+          { workOrderId: { contains: kw, mode: 'insensitive' } },
+          { orderId: { contains: kw, mode: 'insensitive' } },
+          { equipment: { contains: kw, mode: 'insensitive' } },
+          { material: { contains: kw, mode: 'insensitive' } },
+          { reportedBy: { contains: kw, mode: 'insensitive' } },
+          { description: { contains: kw, mode: 'insensitive' } },
+        ]
+      }
+    }
+
+    const [total, rows] = await this.prisma.$transaction([
+      this.prisma.incident.count({ where }),
+      this.prisma.incident.findMany({
+        where,
+        orderBy: [{ updatedAt: 'desc' }, { id: 'desc' }],
+        skip,
+        take: pageSize,
+      }),
+    ])
+
+    return { page, pageSize, total, items: rows.map(toDto) }
   }
 
   async getById(id: string): Promise<IncidentDto | null> {
