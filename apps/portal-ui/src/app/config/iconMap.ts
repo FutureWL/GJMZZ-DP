@@ -21,6 +21,8 @@ import {
 
 export type IconComponent = ComponentType<{ className?: string }>
 
+export const DefaultMenuIcon: IconComponent = FileText
+
 export const IconMap: Record<string, IconComponent> = {
   Activity,
   BadgeCheck,
@@ -41,8 +43,7 @@ export const IconMap: Record<string, IconComponent> = {
   Wrench,
 }
 
-export function getIconByName(iconName: string | null | undefined): IconComponent | undefined {
-  if (!iconName) return undefined
-  return IconMap[iconName]
+export function getIconByName(iconName: string | null | undefined): IconComponent {
+  if (!iconName) return DefaultMenuIcon
+  return IconMap[iconName] ?? DefaultMenuIcon
 }
-

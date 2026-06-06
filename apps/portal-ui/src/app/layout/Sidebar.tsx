@@ -172,7 +172,20 @@ export function Sidebar({
             )
           }
 
-          if (!node.to) return null
+          if (!node.to) {
+            return (
+              <div
+                key={node.id}
+                className={clsx(
+                  'flex rounded-[8px] py-2 pr-2 text-sm text-[var(--color-text-tertiary)]',
+                  isInActivePath && 'bg-black/5 dark:bg-white/5',
+                )}
+                style={{ paddingLeft }}
+              >
+                <span className="truncate">{node.label}</span>
+              </div>
+            )
+          }
           const Icon = node.icon
           return (
             <NavLink
@@ -241,6 +254,36 @@ export function Sidebar({
       <div className={clsx('h-[calc(100vh-56px)] overflow-auto py-4', collapsed ? 'px-2' : 'px-3')}>
         {userMenu.loading ? (
           <SidebarSkeleton collapsed={collapsed} />
+        ) : userMenu.error ? (
+          collapsed ? (
+            <div className="px-2 py-4">
+              <button
+                type="button"
+                className="flex w-full items-center justify-center rounded-[10px] bg-black/5 py-2 text-sm text-[var(--color-text-secondary)] hover:bg-black/10 dark:bg-white/5 dark:hover:bg-white/10"
+                onClick={userMenu.reload}
+                title="菜单加载失败，点击重试"
+              >
+                重试
+              </button>
+            </div>
+          ) : (
+            <div className="px-3 py-4">
+              <div className="rounded-[10px] border border-[var(--color-border-subtle)] bg-black/5 p-3 text-sm dark:bg-white/5">
+                <div className="text-[var(--color-text-secondary)]">菜单加载失败</div>
+                <button
+                  type="button"
+                  className="mt-2 inline-flex items-center rounded-[8px] bg-black/10 px-3 py-1.5 text-sm text-[var(--color-text-primary)] hover:bg-black/15 dark:bg-white/10 dark:hover:bg-white/15"
+                  onClick={userMenu.reload}
+                >
+                  点击重试
+                </button>
+              </div>
+            </div>
+          )
+        ) : menu.length === 0 ? (
+          collapsed ? null : (
+            <div className="px-3 py-4 text-sm text-[var(--color-text-secondary)]">暂无可用菜单</div>
+          )
         ) : collapsed ? (
           <div className="flex flex-col gap-1">
             {flattenLeafItems(menu).map((item) => {
@@ -263,8 +306,6 @@ export function Sidebar({
               )
             })}
           </div>
-        ) : userMenu.error && menu.length === 0 ? (
-          <div className="px-3 py-4 text-sm text-[var(--color-text-secondary)]">菜单加载失败</div>
         ) : (
           <div className="flex flex-col gap-4">{renderNodes(menu, 1, 'root')}</div>
         )}
