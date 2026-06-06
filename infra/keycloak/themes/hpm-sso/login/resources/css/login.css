@@ -1,0 +1,306 @@
+:root {
+  --hpm-brand-700: #0f2b4f;
+  --hpm-brand-600: #1a4a7a;
+  --hpm-brand-500: #2d6cdf;
+  --hpm-bg: #eef2f7;
+  --hpm-surface: #ffffff;
+  --hpm-panel: #e8edf5;
+  --hpm-border: #d0d9e6;
+  --hpm-text-1: #0a1a2e;
+  --hpm-text-2: #4d6278;
+  --hpm-text-3: #7a8ba0;
+  --hpm-accent: #2d6cdf;
+  --hpm-accent-subtle: rgba(45, 108, 223, 0.08);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  min-height: 100vh;
+  background: linear-gradient(160deg, #dce3ed 0%, #eef2f7 50%, #e4eaf2 100%) !important;
+  color: var(--hpm-text-1);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* Engineering grid background */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(45, 108, 223, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(45, 108, 223, 0.04) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Decorative geometric accent - top right */
+body::after {
+  content: "";
+  position: fixed;
+  top: -120px;
+  right: -120px;
+  width: 480px;
+  height: 480px;
+  border: 1px solid rgba(45, 108, 223, 0.06);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.pf-v5-c-login {
+  --pf-v5-c-login__container--MaxWidth: 100%;
+  position: relative;
+  z-index: 1;
+}
+
+.pf-v5-c-login__container {
+  min-height: 100vh;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pf-v5-c-login__header {
+  display: none;
+}
+
+.pf-v5-c-login__main {
+  position: relative;
+  width: 400px;
+  padding: 44px 40px 36px;
+  background: var(--hpm-surface) !important;
+  border: 0;
+  border-radius: 16px;
+  box-shadow:
+    0 1px 3px rgba(10, 26, 46, 0.04),
+    0 8px 32px rgba(10, 26, 46, 0.06);
+}
+
+/* Precision accent bar at top of card */
+.pf-v5-c-login__main::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 40px;
+  right: 40px;
+  height: 3px;
+  border-radius: 0 0 2px 2px;
+  background: linear-gradient(90deg, var(--hpm-brand-500), var(--hpm-brand-600));
+}
+
+.pf-v5-c-login__main-header {
+  padding: 0 0 32px;
+  text-align: center;
+}
+
+.pf-v5-c-login__main-header-utilities {
+  display: none;
+}
+
+.pf-v5-c-title.pf-m-3xl {
+  margin: 0;
+  color: var(--hpm-text-1);
+  font-size: 0;
+}
+
+/* Brand badge */
+.hpm-brand-badge {
+  display: inline-block;
+  padding: 4px 14px;
+  margin-bottom: 14px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--hpm-brand-500);
+  background: var(--hpm-accent-subtle);
+  border-radius: 4px;
+}
+
+/* Title */
+.hpm-panel-title {
+  display: block;
+  font-size: 22px;
+  line-height: 1.35;
+  font-weight: 700;
+  color: var(--hpm-text-1);
+  letter-spacing: -0.01em;
+}
+
+.pf-v5-c-content {
+  color: var(--hpm-text-2);
+}
+
+.pf-v5-c-login__main-body {
+  padding: 0;
+}
+
+/* Form group spacing */
+.pf-v5-c-form__group {
+  margin-bottom: 18px;
+}
+
+/* Labels */
+.pf-v5-c-form__label-text {
+  color: var(--hpm-text-1);
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.01em;
+}
+
+/* Input wrapper with icon */
+.hpm-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.hpm-input-icon {
+  position: absolute;
+  left: 14px;
+  color: var(--hpm-text-3);
+  pointer-events: none;
+  transition: color 0.2s ease;
+  flex-shrink: 0;
+}
+
+/* Inputs */
+.pf-v5-c-form-control {
+  width: 100%;
+  height: 46px;
+  padding: 0 14px 0 40px;
+  border-radius: 8px;
+  border: 1px solid var(--hpm-border);
+  background: #fff;
+  color: var(--hpm-text-1);
+  font-size: 14px;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+  outline: none;
+}
+
+.pf-v5-c-form-control:hover {
+  border-color: #b0bed0;
+}
+
+.pf-v5-c-form-control:focus {
+  border-color: var(--hpm-brand-500);
+  box-shadow: 0 0 0 3px rgba(45, 108, 223, 0.1);
+}
+
+.pf-v5-c-form-control:focus ~ .hpm-input-icon {
+  color: var(--hpm-brand-500);
+}
+
+.pf-v5-c-form-control::placeholder {
+  color: var(--hpm-text-3);
+}
+
+/* Submit button */
+.pf-v5-c-button.pf-m-primary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  height: 48px;
+  border: 0 !important;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--hpm-brand-600) 0%, var(--hpm-brand-500) 100%) !important;
+  box-shadow: 0 2px 8px rgba(26, 74, 122, 0.2);
+  font-weight: 600;
+  font-size: 15px;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.pf-v5-c-button.pf-m-primary:hover {
+  background: linear-gradient(135deg, var(--hpm-brand-700) 0%, var(--hpm-brand-600) 100%) !important;
+  box-shadow: 0 4px 16px rgba(26, 74, 122, 0.3);
+  transform: translateY(-1px);
+}
+
+.pf-v5-c-button.pf-m-primary:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 4px rgba(26, 74, 122, 0.2);
+}
+
+.hpm-btn-arrow {
+  transition: transform 0.25s ease;
+}
+
+.pf-v5-c-button.pf-m-primary:hover .hpm-btn-arrow {
+  transform: translateX(3px);
+}
+
+#kc-form-buttons {
+  margin-top: 26px;
+}
+
+/* Footer info */
+.hpm-footer-info {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid var(--hpm-border);
+  text-align: center;
+}
+
+.hpm-footer-text {
+  color: var(--hpm-text-3);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+/* Error message */
+.pf-v5-c-form-control[aria-invalid="true"] {
+  border-color: #d32f2f;
+  box-shadow: 0 0 0 3px rgba(211, 47, 47, 0.08);
+}
+
+#input-error {
+  display: block;
+  margin-top: 6px;
+  color: #d32f2f;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+@media (max-width: 480px) {
+  body {
+    background: var(--hpm-surface) !important;
+  }
+
+  body::before,
+  body::after {
+    display: none;
+  }
+
+  .pf-v5-c-login__container {
+    padding: 0;
+    align-items: stretch;
+  }
+
+  .pf-v5-c-login__main {
+    width: 100%;
+    max-width: 100%;
+    padding: 36px 24px 28px;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .pf-v5-c-login__main::before {
+    left: 24px;
+    right: 24px;
+  }
+
+  .hpm-panel-title {
+    font-size: 20px;
+  }
+}

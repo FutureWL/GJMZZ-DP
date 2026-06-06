@@ -55,7 +55,15 @@ services:
 
   keycloak:
     image: quay.io/keycloak/keycloak:26.0.5
-    command: ["start-dev", "--http-port=8080", "--import-realm"]
+    command:
+      [
+        "start-dev",
+        "--http-port=8080",
+        "--import-realm",
+        "--spi-theme-static-max-age=-1",
+        "--spi-theme-cache-themes=false",
+        "--spi-theme-cache-templates=false",
+      ]
     environment:
       KC_DB: postgres
       KC_DB_URL_HOST: db
@@ -74,6 +82,7 @@ services:
     volumes:
       - ./data/keycloak:/opt/keycloak/data
       - ./infra/compose/sso-dev/realm:/opt/keycloak/data/import:ro
+      - ./infra/keycloak/themes:/opt/keycloak/themes:ro
     depends_on:
       db:
         condition: service_healthy
