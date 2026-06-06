@@ -22,8 +22,9 @@ import type { PortalId } from '../types'
 
 export interface NavItem {
   label: string
-  to: string
+  to?: string
   icon?: ComponentType<{ className?: string }>
+  children?: NavItem[]
 }
 
 export interface NavSection {
@@ -110,25 +111,45 @@ export const PORTALS: PortalConfig[] = [
       {
         label: '综合管理',
         items: [
-          { label: '审批中心', to: '/management/approval', icon: BadgeCheck },
-          { label: '通知中心', to: '/management/notifications', icon: Activity },
-          { label: '审计日志', to: '/management/audit/log', icon: ClipboardList },
-          { label: '权限矩阵', to: '/management/security/permissions', icon: Shield },
-          { label: '费用报销', to: '/management/erp/expenses', icon: Receipt },
-          { label: '费用流程看板', to: '/management/expense/dashboard', icon: LineChart },
-          { label: '员工服务工作台', to: '/support/home', icon: LifeBuoy },
-          { label: '工单中心', to: '/support/tickets', icon: ClipboardList },
-          { label: '服务请求', to: '/support/requests', icon: FileText },
-          { label: '公告', to: '/support/notices', icon: Activity },
-          { label: '知识库/SOP', to: '/support/kb', icon: FileText },
-          { label: '人事（占位）', to: '/support/hr', icon: Users },
-          { label: '财务（占位）', to: '/support/finance', icon: LineChart },
-          { label: 'IT 工单（原入口）', to: '/support/it/tickets', icon: Wrench },
-          { label: '附加中心', to: '/additional/home', icon: LayoutDashboard },
-          { label: '我的申请（附加）', to: '/additional/requests', icon: ClipboardList },
-          { label: '多端 UI 原型', to: '/additional/prototypes', icon: LayoutDashboard },
-          { label: '总后台（附加）', to: '/additional/admin', icon: BadgeCheck },
-          { label: '个人信息', to: '/account/profile', icon: Users },
+          {
+            label: '流程与合规',
+            children: [
+              { label: '审批中心', to: '/management/approval', icon: BadgeCheck },
+              { label: '通知中心', to: '/management/notifications', icon: Activity },
+              { label: '审计日志', to: '/management/audit/log', icon: ClipboardList },
+              { label: '权限矩阵', to: '/management/security/permissions', icon: Shield },
+            ],
+          },
+          {
+            label: '财务与费控',
+            children: [
+              { label: '费用报销', to: '/management/erp/expenses', icon: Receipt },
+              { label: '费用流程看板', to: '/management/expense/dashboard', icon: LineChart },
+            ],
+          },
+          {
+            label: '员工服务与IT',
+            children: [
+              { label: '员工服务工作台', to: '/support/home', icon: LifeBuoy },
+              { label: '工单中心', to: '/support/tickets', icon: ClipboardList },
+              { label: '服务请求', to: '/support/requests', icon: FileText },
+              { label: '公告', to: '/support/notices', icon: Activity },
+              { label: '知识库/SOP', to: '/support/kb', icon: FileText },
+              { label: '人事（占位）', to: '/support/hr', icon: Users },
+              { label: '财务（占位）', to: '/support/finance', icon: LineChart },
+              { label: 'IT 工单（原入口）', to: '/support/it/tickets', icon: Wrench },
+            ],
+          },
+          {
+            label: '附加与个人',
+            children: [
+              { label: '附加中心', to: '/additional/home', icon: LayoutDashboard },
+              { label: '我的申请（附加）', to: '/additional/requests', icon: ClipboardList },
+              { label: '多端 UI 原型', to: '/additional/prototypes', icon: LayoutDashboard },
+              { label: '总后台（附加）', to: '/additional/admin', icon: BadgeCheck },
+              { label: '个人信息', to: '/account/profile', icon: Users },
+            ],
+          },
         ],
       },
     ],
