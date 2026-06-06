@@ -1,4 +1,4 @@
-import { Navigate, Route, Routes } from 'react-router-dom'
+import { Navigate, Route, Routes, useParams } from 'react-router-dom'
 import { AppLayout } from '../layout/AppLayout'
 import { SearchPage } from '../pages/SearchPage'
 import { PlaceholderPage } from '../pages/PlaceholderPage'
@@ -55,7 +55,6 @@ import { TracePage } from '../pages/production/TracePage'
 import { WorkOrderDetailPage } from '../pages/production/WorkOrderDetailPage'
 import { WorkOrderListPage } from '../pages/production/WorkOrderListPage'
 import { MaintenanceDashboardPage } from '../pages/production/maintenance/MaintenanceDashboardPage'
-import { MaintenanceGuidePage } from '../pages/production/maintenance/MaintenanceGuidePage'
 import { MaintenanceTicketNewPage } from '../pages/production/maintenance/MaintenanceTicketNewPage'
 import { DispatchListPage } from '../pages/production/mes/DispatchListPage'
 import { QualityTaskDetailPage } from '../pages/production/mes/QualityTaskDetailPage'
@@ -110,6 +109,31 @@ import {
 } from '../pages/additional/AdditionalModulePages'
 import { ProtectedRoute } from './ProtectedRoute'
 import { useAuth } from '../state/auth/useAuth'
+
+function RedirectRiskDetail() {
+  const { riskId } = useParams()
+  return <Navigate to={riskId ? `/quality/delivery-pool/${riskId}` : '/quality/delivery-pool'} replace />
+}
+
+function RedirectIncidentDetail() {
+  const { id } = useParams()
+  return <Navigate to={id ? `/quality/exceptions/${id}` : '/quality/exceptions'} replace />
+}
+
+function RedirectIncidentEdit() {
+  const { id } = useParams()
+  return <Navigate to={id ? `/quality/exceptions/${id}/edit` : '/quality/exceptions'} replace />
+}
+
+function RedirectInspectionDetail() {
+  const { id } = useParams()
+  return <Navigate to={id ? `/quality/inspections/${id}` : '/quality/inspections'} replace />
+}
+
+function RedirectMaintenanceDetail() {
+  const { id } = useParams()
+  return <Navigate to={id ? `/equipment/workorders/${id}` : '/equipment/workorders'} replace />
+}
 
 export function AppRoutes() {
   const auth = useAuth()
@@ -192,36 +216,60 @@ export function AppRoutes() {
             <Route path="*" element={<Navigate to="/management/procurement/pr" replace />} />
           </Route>
 
+          <Route path="/quality">
+            <Route path="delivery-overview" element={<DeliveryRiskOverviewPage />} />
+            <Route path="delivery-pool" element={<RiskListPage />} />
+            <Route path="delivery-pool/:riskId" element={<RiskDetailPage />} />
+            <Route path="alerts" element={<AlarmCenterPage />} />
+            <Route path="exceptions" element={<IncidentListPage />} />
+            <Route path="exceptions/new" element={<IncidentUpsertPage mode="create" />} />
+            <Route path="exceptions/:id" element={<IncidentDetailPage />} />
+            <Route path="exceptions/:id/edit" element={<IncidentUpsertPage mode="edit" />} />
+            <Route path="inspections" element={<QualityTaskListPage />} />
+            <Route path="inspections/:id" element={<QualityTaskDetailPage />} />
+            <Route path="traceability" element={<TracePage />} />
+            <Route path="*" element={<Navigate to="/quality/delivery-overview" replace />} />
+          </Route>
+
+          <Route path="/equipment">
+            <Route path="monitoring" element={<PlaceholderPage title="设备监控（占位）" />} />
+            <Route path="workorders" element={<MaintenanceTicketListPage />} />
+            <Route path="workorders/new" element={<MaintenanceTicketNewPage />} />
+            <Route path="workorders/:id" element={<MaintenanceTicketDetailPage />} />
+            <Route path="dashboard" element={<MaintenanceDashboardPage />} />
+            <Route path="*" element={<Navigate to="/equipment/workorders" replace />} />
+          </Route>
+
           <Route path="/production">
             <Route path="overview" element={<ProductionOverviewPage />} />
             <Route path="meeting" element={<MorningMeetingGroupPage />} />
             <Route path="meeting/factories/:factoryId" element={<MorningMeetingFactoryPage />} />
             <Route path="meeting/risks/:id" element={<MorningMeetingRiskDetailPage />} />
-            <Route path="delivery/overview" element={<DeliveryRiskOverviewPage />} />
+            <Route path="delivery/overview" element={<Navigate to="/quality/delivery-overview" replace />} />
             <Route path="delivery/material-shortage" element={<MaterialShortagePage />} />
             <Route path="delivery/bottlenecks" element={<BottlenecksPage />} />
             <Route path="delivery/quality-holds" element={<QualityHoldsPage />} />
-            <Route path="risks" element={<RiskListPage />} />
-            <Route path="risks/:riskId" element={<RiskDetailPage />} />
-            <Route path="alarms" element={<AlarmCenterPage />} />
-            <Route path="incidents" element={<IncidentListPage />} />
-            <Route path="incidents/new" element={<IncidentUpsertPage mode="create" />} />
-            <Route path="incidents/:id" element={<IncidentDetailPage />} />
-            <Route path="incidents/:id/edit" element={<IncidentUpsertPage mode="edit" />} />
+            <Route path="risks" element={<Navigate to="/quality/delivery-pool" replace />} />
+            <Route path="risks/:riskId" element={<RedirectRiskDetail />} />
+            <Route path="alarms" element={<Navigate to="/quality/alerts" replace />} />
+            <Route path="incidents" element={<Navigate to="/quality/exceptions" replace />} />
+            <Route path="incidents/new" element={<Navigate to="/quality/exceptions/new" replace />} />
+            <Route path="incidents/:id" element={<RedirectIncidentDetail />} />
+            <Route path="incidents/:id/edit" element={<RedirectIncidentEdit />} />
             <Route path="mes/dispatch" element={<DispatchListPage />} />
             <Route path="mes/report" element={<ReportPage />} />
-            <Route path="mes/quality" element={<QualityTaskListPage />} />
-            <Route path="mes/quality/:id" element={<QualityTaskDetailPage />} />
+            <Route path="mes/quality" element={<Navigate to="/quality/inspections" replace />} />
+            <Route path="mes/quality/:id" element={<RedirectInspectionDetail />} />
             <Route path="workorders" element={<WorkOrderListPage />} />
             <Route path="workorders/:id" element={<WorkOrderDetailPage />} />
             <Route path="schedule" element={<PlaceholderPage title="排程（占位）" />} />
-            <Route path="trace" element={<TracePage />} />
-            <Route path="equipment" element={<PlaceholderPage title="设备监控（占位）" />} />
-            <Route path="maintenance/guide" element={<MaintenanceGuidePage />} />
-            <Route path="maintenance/new" element={<MaintenanceTicketNewPage />} />
-            <Route path="maintenance/dashboard" element={<MaintenanceDashboardPage />} />
-            <Route path="maintenance" element={<MaintenanceTicketListPage />} />
-            <Route path="maintenance/:id" element={<MaintenanceTicketDetailPage />} />
+            <Route path="trace" element={<Navigate to="/quality/traceability" replace />} />
+            <Route path="equipment" element={<Navigate to="/equipment/monitoring" replace />} />
+            <Route path="maintenance/guide" element={<Navigate to="/equipment/workorders" replace />} />
+            <Route path="maintenance/new" element={<Navigate to="/equipment/workorders/new" replace />} />
+            <Route path="maintenance/dashboard" element={<Navigate to="/equipment/dashboard" replace />} />
+            <Route path="maintenance" element={<Navigate to="/equipment/workorders" replace />} />
+            <Route path="maintenance/:id" element={<RedirectMaintenanceDetail />} />
             <Route path="*" element={<Navigate to="/production/overview" replace />} />
           </Route>
 
