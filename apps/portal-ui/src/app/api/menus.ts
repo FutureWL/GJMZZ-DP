@@ -54,8 +54,9 @@ const MOCK_MENU_JSON = JSON.stringify([
   { id: 'sales-business', portalId: 'main', parentId: 'sales-customers', label: '销售与订单', path: null, iconName: null, sortOrder: 2, requiredRoles: [] },
   { id: '/sales/business/opportunities', portalId: 'main', parentId: 'sales-business', label: '机会', path: '/sales/business/opportunities', iconName: 'Target', sortOrder: 1, requiredRoles: [] },
   { id: '/sales/business/quotes', portalId: 'main', parentId: 'sales-business', label: '报价', path: '/sales/business/quotes', iconName: 'FileSignature', sortOrder: 2, requiredRoles: [] },
-  { id: '/sales/business/order360', portalId: 'main', parentId: 'sales-business', label: '订单360', path: '/sales/business/order360', iconName: 'PackageSearch', sortOrder: 3, requiredRoles: [] },
-  { id: '/sales/business/dashboard', portalId: 'main', parentId: 'sales-business', label: '经营驾驶舱', path: '/sales/business/dashboard', iconName: 'BarChart4', sortOrder: 4, requiredRoles: [] },
+  { id: '/sales/order', portalId: 'main', parentId: 'sales-business', label: '销售订单', path: '/sales/order', iconName: 'ClipboardList', sortOrder: 3, requiredRoles: [] },
+  { id: '/sales/business/order360', portalId: 'main', parentId: 'sales-business', label: '订单360', path: '/sales/business/order360', iconName: 'PackageSearch', sortOrder: 4, requiredRoles: [] },
+  { id: '/sales/business/dashboard', portalId: 'main', parentId: 'sales-business', label: '经营驾驶舱', path: '/sales/business/dashboard', iconName: 'BarChart4', sortOrder: 5, requiredRoles: [] },
 
   { id: 'planning-production', portalId: 'main', parentId: null, label: '计划与生产', path: null, iconName: null, sortOrder: 30, requiredRoles: [] },
   { id: 'production-dashboards', portalId: 'main', parentId: 'planning-production', label: '生产看板', path: null, iconName: null, sortOrder: 1, requiredRoles: [] },

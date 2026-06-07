@@ -48,6 +48,57 @@ function injectBadIcon(items: ApiMenuItem[]): ApiMenuItem[] {
   return items.map((x, i) => (i === idx ? { ...x, iconName: '___BAD_ICON___' } : x))
 }
 
+function ensureSalesOrdersEntry(items: ApiMenuItem[]): ApiMenuItem[] {
+  const quote = items.find((x) => x.path === '/sales/business/quotes')
+  if (!quote?.parentId) return items
+
+  const parentId = quote.parentId
+  const exists = items.some((x) => x.parentId === parentId && x.path === '/sales/order')
+  if (exists) return items
+
+  const order360 = items.find((x) => x.parentId === parentId && x.path === '/sales/business/order360')
+  const qa = typeof quote.sortOrder === 'number' ? quote.sortOrder : 0
+  const ob = typeof order360?.sortOrder === 'number' ? (order360?.sortOrder as number) : undefined
+  const sortOrder = typeof ob === 'number' ? (qa + ob) / 2 : qa + 0.5
+
+  return [
+    ...items,
+    {
+      id: '/sales/order',
+      portalId: quote.portalId,
+      parentId,
+      label: '销售订单',
+      path: '/sales/order',
+      iconName: 'ClipboardList',
+      sortOrder,
+      requiredRoles: [],
+    },
+  ]
+}
+
+function ensureSalesOrdersEntryTree(nodes: MenuNode[]): MenuNode[] {
+  const insert = (list: MenuNode[]): MenuNode[] => {
+    const idxQuote = list.findIndex((n) => n.to === '/sales/business/quotes')
+    if (idxQuote >= 0) {
+      const exists = list.some((n) => n.to === '/sales/order')
+      if (exists) return list.map((n) => ({ ...n, children: n.children?.length ? insert(n.children) : undefined }))
+
+      const next = [...list]
+      next.splice(idxQuote + 1, 0, {
+        id: '/sales/order',
+        label: '销售订单',
+        to: '/sales/order',
+        icon: getIconByName('ClipboardList'),
+      })
+      return next.map((n) => ({ ...n, children: n.children?.length ? insert(n.children) : undefined }))
+    }
+
+    return list.map((n) => ({ ...n, children: n.children?.length ? insert(n.children) : undefined }))
+  }
+
+  return insert(nodes)
+}
+
 function isFlatMenuArray(value: unknown): value is ApiMenuItem[] {
   if (!Array.isArray(value)) return false
   return value.every((v) => v && typeof v === 'object' && 'id' in v && 'label' in v && 'parentId' in v)
@@ -85,12 +136,13 @@ export function useUserMenu() {
         const raw = await fetchUserMenu(token)
         if (!mounted) return
         if (isFlatMenuArray(raw)) {
-          const items = DEBUG_MENU.enabled && DEBUG_MENU.mockBadIcon ? injectBadIcon(raw) : raw
+          const injected = ensureSalesOrdersEntry(raw)
+          const items = DEBUG_MENU.enabled && DEBUG_MENU.mockBadIcon ? injectBadIcon(injected) : injected
           setState({ loading: false, error: null, data: buildMenuTree(items, getIconByName) })
           return
         }
         if (isTreeMenuArray(raw)) {
-          setState({ loading: false, error: null, data: normalizeTreeMenu(raw) })
+          setState({ loading: false, error: null, data: ensureSalesOrdersEntryTree(normalizeTreeMenu(raw)) })
           return
         }
         throw new Error('Invalid menu response')

@@ -504,7 +504,7 @@ export function CreateSalesOrderPage() {
 
       <div className="sticky bottom-0 z-20 mt-4 border-t border-[var(--color-border-subtle)] bg-[var(--color-bg-page)] py-3">
         <div className="flex flex-wrap items-center justify-end gap-2">
-          <Button variant="ghost" onClick={() => nav('/sales/business/order360')}>
+          <Button variant="ghost" onClick={() => nav('/sales/order')}>
             取消
           </Button>
           <Button variant="secondary" onClick={onSaveDraft}>

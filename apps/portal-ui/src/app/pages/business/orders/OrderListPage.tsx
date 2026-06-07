@@ -73,7 +73,7 @@ export function OrderListPage() {
         title="订单"
         description="订单列表 → 订单360（示例数据）"
         right={
-          <Link to="/sales/business/orders/new">
+          <Link to="/sales/order/create">
             <Button variant="primary">新建销售订单</Button>
           </Link>
         }

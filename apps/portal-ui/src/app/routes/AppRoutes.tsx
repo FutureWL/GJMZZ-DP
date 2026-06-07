@@ -3,6 +3,7 @@ import { AppLayout } from '../layout/AppLayout'
 import { SearchPage } from '../pages/SearchPage'
 import { PlaceholderPage } from '../pages/PlaceholderPage'
 import { WorkbenchPage } from '../pages/workbench/WorkbenchPage'
+import { WorkflowTaskPage } from '../pages/workflow/WorkflowTaskPage'
 import { BusinessDashboardPage } from '../pages/business/BusinessDashboardPage'
 import { ActivityListPage } from '../pages/business/crm/ActivityListPage'
 import { ContactDetailPage } from '../pages/business/crm/ContactDetailPage'
@@ -16,6 +17,7 @@ import { QuoteListPage } from '../pages/business/crm/QuoteListPage'
 import { Order360DetailPage } from '../pages/business/orders/Order360DetailPage'
 import { CreateSalesOrderPage } from '../pages/business/orders/CreateSalesOrderPage'
 import { OrderListPage } from '../pages/business/orders/OrderListPage'
+import { SalesOrderListPage } from '../pages/business/orders/SalesOrderListPage'
 import { LoginPage } from '../pages/auth/LoginPage'
 import { AccountLayout } from '../pages/account/AccountLayout'
 import { ProfilePage } from '../pages/account/ProfilePage'
@@ -208,6 +210,7 @@ export function AppRoutes() {
       <Route element={<ProtectedRoute />}>
         <Route element={<AppLayout portalId="main" />}>
           <Route path="/workbench" element={<WorkbenchPage />} />
+            <Route path="/workflow/tasks/:id" element={<WorkflowTaskPage />} />
           <Route path="/search" element={<SearchPage />} />
 
           <Route path="/sales">
@@ -221,9 +224,11 @@ export function AppRoutes() {
             <Route path="business/quotes" element={<QuoteListPage />} />
             <Route path="business/quotes/:id" element={<QuoteDetailPage />} />
             <Route path="business/order360" element={<OrderListPage />} />
-            <Route path="business/orders/new" element={<CreateSalesOrderPage />} />
+            <Route path="business/orders/new" element={<Navigate to="/sales/order/create" replace />} />
             <Route path="business/order360/:id" element={<Order360DetailPage />} />
             <Route path="business/dashboard" element={<BusinessDashboardPage />} />
+            <Route path="order" element={<SalesOrderListPage />} />
+            <Route path="order/create" element={<CreateSalesOrderPage />} />
             <Route path="*" element={<Navigate to="/sales/business/dashboard" replace />} />
           </Route>
 
@@ -250,7 +255,7 @@ export function AppRoutes() {
             <Route path="crm/quotes" element={<Navigate to="/sales/business/quotes" replace />} />
             <Route path="crm/quotes/:id" element={<RedirectQuoteDetail />} />
             <Route path="orders" element={<Navigate to="/sales/business/order360" replace />} />
-            <Route path="orders/new" element={<Navigate to="/sales/business/orders/new" replace />} />
+            <Route path="orders/new" element={<Navigate to="/sales/order/create" replace />} />
             <Route path="orders/:id" element={<RedirectOrder360Detail />} />
             <Route path="*" element={<Navigate to="/sales/business/dashboard" replace />} />
           </Route>
