@@ -12,14 +12,24 @@ export function Modal({
   onClose,
   onConfirm,
   confirmText = '确定',
+  confirmLoadingText = '提交中...',
+  confirmLoading = false,
+  confirmDisabled,
+  confirmButtonType = 'button',
+  confirmFormId,
   cancelText = '取消',
 }: {
   open: boolean
   title: ReactNode
   children: ReactNode
   onClose: () => void
-  onConfirm: () => void
+  onConfirm?: () => void
   confirmText?: string
+  confirmLoadingText?: string
+  confirmLoading?: boolean
+  confirmDisabled?: boolean
+  confirmButtonType?: 'button' | 'submit'
+  confirmFormId?: string
   cancelText?: string
 }) {
   const [entered, setEntered] = useState(false)
@@ -66,11 +76,17 @@ export function Modal({
         <div className="max-h-[70vh] overflow-auto p-4">{children}</div>
 
         <div className="flex items-center justify-end gap-2 border-t border-[var(--color-border-subtle)] bg-[var(--color-bg-surface)] px-4 py-3">
-          <Button variant="secondary" onClick={onClose}>
+          <Button variant="secondary" onClick={onClose} disabled={confirmLoading}>
             {cancelText}
           </Button>
-          <Button variant="primary" onClick={onConfirm}>
-            {confirmText}
+          <Button
+            variant="primary"
+            type={confirmButtonType}
+            form={confirmFormId}
+            onClick={confirmButtonType === 'button' ? onConfirm : undefined}
+            disabled={confirmDisabled ?? confirmLoading}
+          >
+            {confirmLoading ? confirmLoadingText : confirmText}
           </Button>
         </div>
       </div>
@@ -78,4 +94,3 @@ export function Modal({
     document.body,
   )
 }
-
