@@ -14,7 +14,7 @@ export function AppLayout({ portalId }: { portalId: PortalId }) {
       <TopBar />
       <div className="flex min-h-0 flex-1">
         <Sidebar portal={portal} collapsed={sidebar.collapsed} onToggleCollapsed={sidebar.toggle} />
-        <main className="min-h-0 flex-1 overflow-auto bg-[var(--color-bg-page)]">
+        <main className="no-scrollbar min-h-0 flex-1 overflow-auto bg-[var(--color-bg-page)]">
           <div className="mx-auto max-w-[1400px] p-4">
             <Outlet />
             <Footer />

@@ -251,7 +251,7 @@ export function Sidebar({
           </button>
         )}
       </div>
-      <div className={clsx('h-[calc(100vh-56px)] overflow-auto py-4', collapsed ? 'px-2' : 'px-3')}>
+      <div className={clsx('no-scrollbar h-[calc(100vh-56px)] overflow-auto py-4', collapsed ? 'px-2' : 'px-3')}>
         {userMenu.loading ? (
           <SidebarSkeleton collapsed={collapsed} />
         ) : userMenu.error ? (
