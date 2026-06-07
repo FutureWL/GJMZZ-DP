@@ -9,7 +9,6 @@ import { ContactDetailPage } from '../pages/business/crm/ContactDetailPage'
 import { ContactListPage } from '../pages/business/crm/ContactListPage'
 import { CustomerDetailPage } from '../pages/business/crm/CustomerDetailPage'
 import { CustomerListPage } from '../pages/business/crm/CustomerListPage'
-import { CrmProcessGuidePage } from '../pages/business/crm/CrmProcessGuidePage'
 import { OpportunityDetailPage } from '../pages/business/crm/OpportunityDetailPage'
 import { OpportunityListPage } from '../pages/business/crm/OpportunityListPage'
 import { QuoteDetailPage } from '../pages/business/crm/QuoteDetailPage'
@@ -40,7 +39,6 @@ import { ExpenseClaimDetailPage } from '../pages/management/expense/ExpenseClaim
 import { ExpenseClaimNewPage } from '../pages/management/expense/ExpenseClaimNewPage'
 import { ExpenseFlowDashboardPage } from '../pages/management/expense/ExpenseFlowDashboardPage'
 import { ExpenseFlowGuidePage } from '../pages/management/expense/ExpenseFlowGuidePage'
-import { ProcurementGuidePage } from '../pages/management/procurement/ProcurementGuidePage'
 import { ProcurementPRNewPage } from '../pages/management/procurement/ProcurementPRNewPage'
 import { ExpenseDetailPage } from '../pages/management/erp/ExpenseDetailPage'
 import { ExpenseListPage } from '../pages/management/erp/ExpenseListPage'
@@ -135,6 +133,61 @@ function RedirectMaintenanceDetail() {
   return <Navigate to={id ? `/equipment/workorders/${id}` : '/equipment/workorders'} replace />
 }
 
+function RedirectProcurementPrDetail() {
+  const { id } = useParams()
+  return <Navigate to={id ? `/supply/procurement/orders/${id}` : '/supply/procurement/orders'} replace />
+}
+
+function RedirectSupplierDetail() {
+  const { id } = useParams()
+  return <Navigate to={id ? `/supply/suppliers/list/${id}` : '/supply/suppliers/list'} replace />
+}
+
+function RedirectContractReviewDetail() {
+  const { id } = useParams()
+  return <Navigate to={id ? `/supply/suppliers/contracts/${id}` : '/supply/suppliers/contracts'} replace />
+}
+
+function RedirectCustomerDetail() {
+  const { id } = useParams()
+  return <Navigate to={id ? `/sales/crm/customers/${id}` : '/sales/crm/customers'} replace />
+}
+
+function RedirectContactDetail() {
+  const { id } = useParams()
+  return <Navigate to={id ? `/sales/crm/contacts/${id}` : '/sales/crm/contacts'} replace />
+}
+
+function RedirectOpportunityDetail() {
+  const { id } = useParams()
+  return <Navigate to={id ? `/sales/business/opportunities/${id}` : '/sales/business/opportunities'} replace />
+}
+
+function RedirectQuoteDetail() {
+  const { id } = useParams()
+  return <Navigate to={id ? `/sales/business/quotes/${id}` : '/sales/business/quotes'} replace />
+}
+
+function RedirectOrder360Detail() {
+  const { id } = useParams()
+  return <Navigate to={id ? `/sales/business/order360/${id}` : '/sales/business/order360'} replace />
+}
+
+function RedirectMorningMeetingFactory() {
+  const { factoryId } = useParams()
+  return <Navigate to={factoryId ? `/production/dashboards/morning-meeting/factories/${factoryId}` : '/production/dashboards/morning-meeting'} replace />
+}
+
+function RedirectMorningMeetingRisk() {
+  const { id } = useParams()
+  return <Navigate to={id ? `/production/dashboards/morning-meeting/risks/${id}` : '/production/dashboards/morning-meeting'} replace />
+}
+
+function RedirectWorkOrderDetail() {
+  const { id } = useParams()
+  return <Navigate to={id ? `/production/execution/workorders/${id}` : '/production/execution/workorders'} replace />
+}
+
 export function AppRoutes() {
   const auth = useAuth()
   return (
@@ -156,6 +209,22 @@ export function AppRoutes() {
           <Route path="/workbench" element={<WorkbenchPage />} />
           <Route path="/search" element={<SearchPage />} />
 
+          <Route path="/sales">
+            <Route path="crm/customers" element={<CustomerListPage />} />
+            <Route path="crm/customers/:id" element={<CustomerDetailPage />} />
+            <Route path="crm/contacts" element={<ContactListPage />} />
+            <Route path="crm/contacts/:id" element={<ContactDetailPage />} />
+            <Route path="crm/activities" element={<ActivityListPage />} />
+            <Route path="business/opportunities" element={<OpportunityListPage />} />
+            <Route path="business/opportunities/:id" element={<OpportunityDetailPage />} />
+            <Route path="business/quotes" element={<QuoteListPage />} />
+            <Route path="business/quotes/:id" element={<QuoteDetailPage />} />
+            <Route path="business/order360" element={<OrderListPage />} />
+            <Route path="business/order360/:id" element={<Order360DetailPage />} />
+            <Route path="business/dashboard" element={<BusinessDashboardPage />} />
+            <Route path="*" element={<Navigate to="/sales/business/dashboard" replace />} />
+          </Route>
+
           <Route path="/account" element={<AccountLayout />}>
             <Route path="profile" element={<ProfilePage />} />
             <Route path="security" element={<SecurityPage />} />
@@ -165,22 +234,22 @@ export function AppRoutes() {
           </Route>
 
           <Route path="/business">
-            <Route path="dashboard" element={<BusinessDashboardPage />} />
-            <Route path="analysis" element={<PlaceholderPage title="经营分析（占位）" />} />
-            <Route path="sales" element={<PlaceholderPage title="客户与机会（占位）" />} />
-            <Route path="crm/guide" element={<CrmProcessGuidePage />} />
-            <Route path="crm/customers" element={<CustomerListPage />} />
-            <Route path="crm/customers/:id" element={<CustomerDetailPage />} />
-            <Route path="crm/opportunities" element={<OpportunityListPage />} />
-            <Route path="crm/opportunities/:id" element={<OpportunityDetailPage />} />
-            <Route path="crm/contacts" element={<ContactListPage />} />
-            <Route path="crm/contacts/:id" element={<ContactDetailPage />} />
-            <Route path="crm/activities" element={<ActivityListPage />} />
-            <Route path="crm/quotes" element={<QuoteListPage />} />
-            <Route path="crm/quotes/:id" element={<QuoteDetailPage />} />
-            <Route path="orders" element={<OrderListPage />} />
-            <Route path="orders/:id" element={<Order360DetailPage />} />
-            <Route path="*" element={<Navigate to="/business/dashboard" replace />} />
+            <Route path="dashboard" element={<Navigate to="/sales/business/dashboard" replace />} />
+            <Route path="analysis" element={<Navigate to="/sales/business/dashboard" replace />} />
+            <Route path="sales" element={<Navigate to="/sales/business/dashboard" replace />} />
+            <Route path="crm/guide" element={<Navigate to="/sales/crm/customers" replace />} />
+            <Route path="crm/customers" element={<Navigate to="/sales/crm/customers" replace />} />
+            <Route path="crm/customers/:id" element={<RedirectCustomerDetail />} />
+            <Route path="crm/opportunities" element={<Navigate to="/sales/business/opportunities" replace />} />
+            <Route path="crm/opportunities/:id" element={<RedirectOpportunityDetail />} />
+            <Route path="crm/contacts" element={<Navigate to="/sales/crm/contacts" replace />} />
+            <Route path="crm/contacts/:id" element={<RedirectContactDetail />} />
+            <Route path="crm/activities" element={<Navigate to="/sales/crm/activities" replace />} />
+            <Route path="crm/quotes" element={<Navigate to="/sales/business/quotes" replace />} />
+            <Route path="crm/quotes/:id" element={<RedirectQuoteDetail />} />
+            <Route path="orders" element={<Navigate to="/sales/business/order360" replace />} />
+            <Route path="orders/:id" element={<RedirectOrder360Detail />} />
+            <Route path="*" element={<Navigate to="/sales/business/dashboard" replace />} />
           </Route>
 
           <Route path="/management">
@@ -193,23 +262,23 @@ export function AppRoutes() {
             <Route path="expense/claims/new" element={<ExpenseClaimNewPage />} />
             <Route path="expense/claims/:id" element={<ExpenseClaimDetailPage />} />
             <Route path="expense/dashboard" element={<ExpenseFlowDashboardPage />} />
-            <Route path="procurement/guide" element={<ProcurementGuidePage />} />
-            <Route path="procurement/pr/new" element={<ProcurementPRNewPage />} />
-            <Route path="procurement/pr" element={<ProcurementPRListPage />} />
-            <Route path="procurement/pr/:id" element={<ProcurementPRDetailPage />} />
+            <Route path="procurement/guide" element={<Navigate to="/supply/procurement/orders" replace />} />
+            <Route path="procurement/pr/new" element={<Navigate to="/supply/procurement/create-pr" replace />} />
+            <Route path="procurement/pr" element={<Navigate to="/supply/procurement/orders" replace />} />
+            <Route path="procurement/pr/:id" element={<RedirectProcurementPrDetail />} />
             <Route path="procurement/rfq/:id" element={<RFQDetailPage />} />
             <Route path="procurement/po/:id" element={<PODetailPage />} />
             <Route path="contract/guide" element={<ContractGuidePage />} />
-            <Route path="contract/reviews/new" element={<ContractReviewNewPage />} />
-            <Route path="contract/reviews/:id" element={<ContractReviewDetailPage />} />
-            <Route path="srm/suppliers" element={<SupplierListPage />} />
-            <Route path="srm/suppliers/:id" element={<SupplierDetailPage />} />
+            <Route path="contract/reviews/new" element={<Navigate to="/supply/suppliers/contracts" replace />} />
+            <Route path="contract/reviews/:id" element={<RedirectContractReviewDetail />} />
+            <Route path="srm/suppliers" element={<Navigate to="/supply/suppliers/list" replace />} />
+            <Route path="srm/suppliers/:id" element={<RedirectSupplierDetail />} />
             <Route path="erp/inventory" element={<InventoryListPage />} />
             <Route path="erp/inventory/:id" element={<InventoryDetailPage />} />
             <Route path="erp/expenses" element={<ExpenseListPage />} />
             <Route path="erp/expenses/:id" element={<ExpenseDetailPage />} />
             <Route path="erp/master-data" element={<MasterDataPage />} />
-            <Route path="outsourcing/factories" element={<PlaceholderPage title="外协工厂（占位）" />} />
+            <Route path="outsourcing/factories" element={<Navigate to="/supply/suppliers/outsourcing" replace />} />
             <Route path="policy" element={<PlaceholderPage title="制度流程库（占位）" />} />
             <Route path="audit" element={<PlaceholderPage title="内控审计（占位）" />} />
             <Route path="kpi" element={<PlaceholderPage title="目标/KPI（占位）" />} />
@@ -240,11 +309,32 @@ export function AppRoutes() {
             <Route path="*" element={<Navigate to="/equipment/workorders" replace />} />
           </Route>
 
+          <Route path="/supply">
+            <Route path="procurement/orders" element={<ProcurementPRListPage />} />
+            <Route path="procurement/orders/:id" element={<ProcurementPRDetailPage />} />
+            <Route path="procurement/create-pr" element={<ProcurementPRNewPage />} />
+            <Route path="suppliers/list" element={<SupplierListPage />} />
+            <Route path="suppliers/list/:id" element={<SupplierDetailPage />} />
+            <Route path="suppliers/contracts" element={<ContractReviewNewPage />} />
+            <Route path="suppliers/contracts/:id" element={<ContractReviewDetailPage />} />
+            <Route path="suppliers/outsourcing" element={<PlaceholderPage title="外协工厂（占位）" />} />
+            <Route path="*" element={<Navigate to="/supply/procurement/orders" replace />} />
+          </Route>
+
           <Route path="/production">
-            <Route path="overview" element={<ProductionOverviewPage />} />
-            <Route path="meeting" element={<MorningMeetingGroupPage />} />
-            <Route path="meeting/factories/:factoryId" element={<MorningMeetingFactoryPage />} />
-            <Route path="meeting/risks/:id" element={<MorningMeetingRiskDetailPage />} />
+            <Route path="dashboards/factory" element={<ProductionOverviewPage />} />
+            <Route path="dashboards/morning-meeting" element={<MorningMeetingGroupPage />} />
+            <Route path="dashboards/morning-meeting/factories/:factoryId" element={<MorningMeetingFactoryPage />} />
+            <Route path="dashboards/morning-meeting/risks/:id" element={<MorningMeetingRiskDetailPage />} />
+            <Route path="execution/scheduling" element={<PlaceholderPage title="排程（占位）" />} />
+            <Route path="execution/workorders" element={<WorkOrderListPage />} />
+            <Route path="execution/workorders/:id" element={<WorkOrderDetailPage />} />
+            <Route path="execution/dispatch" element={<DispatchListPage />} />
+            <Route path="execution/reporting" element={<ReportPage />} />
+            <Route path="overview" element={<Navigate to="/production/dashboards/factory" replace />} />
+            <Route path="meeting" element={<Navigate to="/production/dashboards/morning-meeting" replace />} />
+            <Route path="meeting/factories/:factoryId" element={<RedirectMorningMeetingFactory />} />
+            <Route path="meeting/risks/:id" element={<RedirectMorningMeetingRisk />} />
             <Route path="delivery/overview" element={<Navigate to="/quality/delivery-overview" replace />} />
             <Route path="delivery/material-shortage" element={<MaterialShortagePage />} />
             <Route path="delivery/bottlenecks" element={<BottlenecksPage />} />
@@ -256,13 +346,13 @@ export function AppRoutes() {
             <Route path="incidents/new" element={<Navigate to="/quality/exceptions/new" replace />} />
             <Route path="incidents/:id" element={<RedirectIncidentDetail />} />
             <Route path="incidents/:id/edit" element={<RedirectIncidentEdit />} />
-            <Route path="mes/dispatch" element={<DispatchListPage />} />
-            <Route path="mes/report" element={<ReportPage />} />
+            <Route path="mes/dispatch" element={<Navigate to="/production/execution/dispatch" replace />} />
+            <Route path="mes/report" element={<Navigate to="/production/execution/reporting" replace />} />
             <Route path="mes/quality" element={<Navigate to="/quality/inspections" replace />} />
             <Route path="mes/quality/:id" element={<RedirectInspectionDetail />} />
-            <Route path="workorders" element={<WorkOrderListPage />} />
-            <Route path="workorders/:id" element={<WorkOrderDetailPage />} />
-            <Route path="schedule" element={<PlaceholderPage title="排程（占位）" />} />
+            <Route path="workorders" element={<Navigate to="/production/execution/workorders" replace />} />
+            <Route path="workorders/:id" element={<RedirectWorkOrderDetail />} />
+            <Route path="schedule" element={<Navigate to="/production/execution/scheduling" replace />} />
             <Route path="trace" element={<Navigate to="/quality/traceability" replace />} />
             <Route path="equipment" element={<Navigate to="/equipment/monitoring" replace />} />
             <Route path="maintenance/guide" element={<Navigate to="/equipment/workorders" replace />} />
@@ -270,7 +360,7 @@ export function AppRoutes() {
             <Route path="maintenance/dashboard" element={<Navigate to="/equipment/dashboard" replace />} />
             <Route path="maintenance" element={<Navigate to="/equipment/workorders" replace />} />
             <Route path="maintenance/:id" element={<RedirectMaintenanceDetail />} />
-            <Route path="*" element={<Navigate to="/production/overview" replace />} />
+            <Route path="*" element={<Navigate to="/production/dashboards/factory" replace />} />
           </Route>
 
           <Route path="/support">
