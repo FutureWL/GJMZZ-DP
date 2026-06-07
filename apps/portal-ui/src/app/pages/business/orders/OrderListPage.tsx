@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { customers } from '../../../mock/data'
 import { Badge, type Tone } from '../../../ui/Badge'
+import { Button } from '../../../ui/Button'
 import { Card, CardBody, CardHeader, CardTitle } from '../../../ui/Card'
 import { Input } from '../../../ui/Input'
 import { PageHeader } from '../../../ui/PageHeader'
@@ -68,7 +69,15 @@ export function OrderListPage() {
 
   return (
     <div>
-      <PageHeader title="订单" description="订单列表 → 订单360（示例数据）" />
+      <PageHeader
+        title="订单"
+        description="订单列表 → 订单360（示例数据）"
+        right={
+          <Link to="/sales/business/orders/new">
+            <Button variant="primary">新建销售订单</Button>
+          </Link>
+        }
+      />
       <Card>
         <CardHeader>
           <CardTitle>订单</CardTitle>
@@ -156,4 +165,3 @@ export function OrderListPage() {
     </div>
   )
 }
-
