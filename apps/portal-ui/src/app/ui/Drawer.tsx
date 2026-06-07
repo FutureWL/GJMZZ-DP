@@ -1,5 +1,6 @@
 import clsx from 'clsx'
 import type { ReactNode } from 'react'
+import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 
 export function Drawer({
@@ -15,6 +16,15 @@ export function Drawer({
 }) {
   if (!open) return null
 
+  const [entered, setEntered] = useState(false)
+
+  useEffect(() => {
+    const id = window.setTimeout(() => setEntered(true), 16)
+    return () => {
+      window.clearTimeout(id)
+    }
+  }, [])
+
   return createPortal(
     <div className="fixed inset-0 z-50">
       <div
@@ -23,7 +33,12 @@ export function Drawer({
         role="button"
         tabIndex={-1}
       />
-      <div className="absolute inset-y-0 right-0 w-full max-w-[520px] border-l border-[var(--color-border-subtle)] bg-[var(--color-bg-page)] shadow-[var(--shadow-2)]">
+      <div
+        className={clsx(
+          'absolute inset-y-0 right-0 w-full max-w-[520px] border-l border-[var(--color-border-subtle)] bg-[var(--color-bg-page)] shadow-[var(--shadow-2)] transition-transform duration-200 ease-out',
+          entered ? 'translate-x-0' : 'translate-x-full',
+        )}
+      >
         <div className="flex h-14 items-center justify-between gap-3 border-b border-[var(--color-border-subtle)] bg-[var(--color-bg-surface)] px-4">
           <div className="min-w-0 truncate text-sm font-semibold text-[var(--color-text-primary)]">
             {title}
