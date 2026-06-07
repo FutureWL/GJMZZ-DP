@@ -29,6 +29,7 @@ services:
       - "33705:5432"
     volumes:
       - ./data/postgres:/var/lib/postgresql/data
+      - ./infra/compose/db/init:/docker-entrypoint-initdb.d:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U factory -d factory"]
       interval: 5s
