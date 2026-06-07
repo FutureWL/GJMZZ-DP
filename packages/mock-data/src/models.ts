@@ -380,7 +380,7 @@ export interface CrmActivity {
   customerId: string
   contactId: string | null
   owner: string
-  status: 'planned' | 'done' | 'canceled'
+  status: 'planned' | 'in_progress' | 'done' | 'canceled'
   dueAt: string
   createdAt: string
 }
