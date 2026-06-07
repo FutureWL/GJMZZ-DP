@@ -4,6 +4,7 @@ import { PageHeader } from '../../ui/PageHeader'
 import { Card, CardBody, CardHeader, CardTitle } from '../../ui/Card'
 import { Button } from '../../ui/Button'
 import { Input } from '../../ui/Input'
+import { TodosPanel } from './TodosPanel'
 
 type WorkbenchTab = 'todos' | 'messages' | 'dashboard'
 
@@ -53,22 +54,7 @@ export function WorkbenchPage() {
 
       {tab === 'todos' ? (
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-          <Card className="lg:col-span-2">
-            <CardHeader>
-              <CardTitle>统一待办（示例）</CardTitle>
-              <Button size="sm" onClick={() => nav('/management/approval')}>
-                打开审批中心
-              </Button>
-            </CardHeader>
-            <CardBody>
-              <div className="text-sm text-[var(--color-text-tertiary)]">第一版先聚合入口，后续对接真实待办数据源。</div>
-              <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-[var(--color-text-secondary)]">
-                <li>采购 PR 待审批</li>
-                <li>费用报销待审批</li>
-                <li>异常单待确认</li>
-              </ul>
-            </CardBody>
-          </Card>
+          <TodosPanel />
           <Card>
             <CardHeader>
               <CardTitle>常用入口</CardTitle>
@@ -169,4 +155,3 @@ export function WorkbenchPage() {
     </div>
   )
 }
-

@@ -53,6 +53,24 @@ services:
       ]
     restart: "no"
 
+  db-init-flowable:
+    image: postgres:16-alpine
+    environment:
+      PGHOST: db
+      PGPORT: 5432
+      PGUSER: factory
+      PGPASSWORD: factory
+    depends_on:
+      db:
+        condition: service_healthy
+    entrypoint:
+      [
+        "sh",
+        "-lc",
+        "set -euo pipefail; psql -d postgres -tc \"SELECT 1 FROM pg_roles WHERE rolname='flowable'\" | grep -q 1 || psql -d postgres -c \"CREATE ROLE flowable LOGIN PASSWORD 'flowable'\"; psql -d postgres -tc \"SELECT 1 FROM pg_database WHERE datname='flowable'\" | grep -q 1 || psql -d postgres -c \"CREATE DATABASE flowable OWNER flowable\"",
+      ]
+    restart: "no"
+
   keycloak:
     image: quay.io/keycloak/keycloak:26.0.5
     command:
@@ -229,4 +247,115 @@ services:
         NO_PROXY: ${NO_PROXY}
     ports:
       - "33703:80"
+    restart: unless-stopped
+
+  flowable-idm:
+    image: flowable/flowable-idm:latest
+    environment:
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/flowable
+      SPRING_DATASOURCE_USERNAME: flowable
+      SPRING_DATASOURCE_PASSWORD: flowable
+    ports:
+      - "33721:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+      db-init-flowable:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
+  flowable-task:
+    image: flowable/flowable-task:latest
+    environment:
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/flowable
+      SPRING_DATASOURCE_USERNAME: flowable
+      SPRING_DATASOURCE_PASSWORD: flowable
+      FLOWABLE_COMMON_APP_IDM_URL: http://flowable-idm:8080/flowable-idm
+      FLOWABLE_COMMON_APP_IDM_REDIRECT_URL: http://localhost:33721/flowable-idm
+      FLOWABLE_COMMON_APP_IDM_ADMIN_USER: admin
+      FLOWABLE_COMMON_APP_IDM_ADMIN_PASSWORD: test
+    ports:
+      - "33722:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+      db-init-flowable:
+        condition: service_completed_successfully
+      flowable-idm:
+        condition: service_started
+    restart: unless-stopped
+
+  flowable-modeler:
+    image: flowable/flowable-modeler:latest
+    environment:
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/flowable
+      SPRING_DATASOURCE_USERNAME: flowable
+      SPRING_DATASOURCE_PASSWORD: flowable
+      FLOWABLE_COMMON_APP_IDM_URL: http://flowable-idm:8080/flowable-idm
+      FLOWABLE_COMMON_APP_IDM_REDIRECT_URL: http://localhost:33721/flowable-idm
+      FLOWABLE_COMMON_APP_IDM_ADMIN_USER: admin
+      FLOWABLE_COMMON_APP_IDM_ADMIN_PASSWORD: test
+      FLOWABLE_MODELER_APP_DEPLOYMENT_API_URL: http://flowable-task:8080/flowable-task/process-api
+    ports:
+      - "33723:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+      db-init-flowable:
+        condition: service_completed_successfully
+      flowable-idm:
+        condition: service_started
+      flowable-task:
+        condition: service_started
+    restart: unless-stopped
+
+  flowable-admin:
+    image: flowable/flowable-admin:latest
+    environment:
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/flowable
+      SPRING_DATASOURCE_USERNAME: flowable
+      SPRING_DATASOURCE_PASSWORD: flowable
+      FLOWABLE_COMMON_APP_IDM_URL: http://flowable-idm:8080/flowable-idm
+      FLOWABLE_COMMON_APP_IDM_REDIRECT_URL: http://localhost:33721/flowable-idm
+      FLOWABLE_COMMON_APP_IDM_ADMIN_USER: admin
+      FLOWABLE_COMMON_APP_IDM_ADMIN_PASSWORD: test
+      FLOWABLE_ADMIN_APP_SERVER_CONFIG_PROCESS_SERVER_ADDRESS: http://flowable-task
+      FLOWABLE_ADMIN_APP_SERVER_CONFIG_PROCESS_PORT: 8080
+      FLOWABLE_ADMIN_APP_SERVER_CONFIG_PROCESS_CONTEXT_ROOT: flowable-task
+      FLOWABLE_ADMIN_APP_SERVER_CONFIG_PROCESS_REST_ROOT: process-api
+    ports:
+      - "33724:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+      db-init-flowable:
+        condition: service_completed_successfully
+      flowable-idm:
+        condition: service_started
+      flowable-task:
+        condition: service_started
+    restart: unless-stopped
+
+  flowable-rest:
+    image: flowable/flowable-rest:latest
+    environment:
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/flowable
+      SPRING_DATASOURCE_USERNAME: flowable
+      SPRING_DATASOURCE_PASSWORD: flowable
+      FLOWABLE_REST_APP_ADMIN_USER_ID: rest-admin
+      FLOWABLE_REST_APP_ADMIN_PASSWORD: test
+      FLOWABLE_REST_APP_ADMIN_FIRST_NAME: Rest
+      FLOWABLE_REST_APP_ADMIN_LAST_NAME: Admin
+    ports:
+      - "33725:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+      db-init-flowable:
+        condition: service_completed_successfully
     restart: unless-stopped
