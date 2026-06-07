@@ -119,16 +119,17 @@ export function TopBar() {
       </div>
 
       <div className="flex flex-1 items-center gap-2">
-        <div className="relative w-full max-w-[560px]">
+        <div className="relative w-full max-w-[560px]" title="搜索服务后端联调中">
           <Search className="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-[var(--color-text-tertiary)]" />
           <Input
             className="pl-9"
-            placeholder="全局搜索：工单/设备/批次/告警/PR/PO/供应商/外协工厂/人员（示例）"
+            placeholder="🔍 全局搜索功能开发中，敬请期待..."
             value={q}
             onChange={(e) => setQ(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === 'Enter') nav(`/search?q=${encodeURIComponent(q)}`)
             }}
+            disabled
           />
         </div>
       </div>

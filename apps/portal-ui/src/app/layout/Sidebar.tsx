@@ -222,10 +222,6 @@ export function Sidebar({
         )}
         title={collapsed ? portal.label : undefined}
       >
-        <div
-          className="h-2.5 w-2.5 rounded-full"
-          style={{ backgroundColor: `var(${portal.domainColorVar})` }}
-        />
         {!collapsed ? (
           <div className="flex flex-1 items-center justify-between gap-2">
             <div className="text-sm font-semibold text-[var(--color-text-primary)]">{portal.label}</div>

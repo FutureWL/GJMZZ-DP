@@ -2,7 +2,7 @@ import { APP_TITLE } from '../appMeta'
 
 export function ProductMark({
   title = APP_TITLE,
-  subtitle = 'ERP · MES · CRM · 五域门户（UI 原型）',
+  subtitle = 'ERP · MES · CRM · 五域门户 (开发版)',
 }: {
   title?: string
   subtitle?: string
