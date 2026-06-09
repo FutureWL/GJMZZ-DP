@@ -17,6 +17,13 @@ services:
       - rabbitmq
       - minio
       - tdengine
+    environment:
+      HTTP_PROXY: ""
+      HTTPS_PROXY: ""
+      http_proxy: ""
+      https_proxy: ""
+      NO_PROXY: "*"
+      no_proxy: "*"
     restart: unless-stopped
 
   db:
@@ -98,7 +105,7 @@ services:
     ports:
       - "18080:8080"
     volumes:
-      - ./data/keycloak:/opt/keycloak/data
+      - keycloak_data:/opt/keycloak/data
       - ./infra/compose/sso-dev/realm:/opt/keycloak/data/import:ro
       - ./infra/keycloak/themes:/opt/keycloak/themes:ro
     depends_on:
@@ -359,3 +366,6 @@ services:
       db-init-flowable:
         condition: service_completed_successfully
     restart: unless-stopped
+
+volumes:
+  keycloak_data:
