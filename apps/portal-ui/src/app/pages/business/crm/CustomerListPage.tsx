@@ -26,6 +26,16 @@ function statusVariant(status: string) {
   return 'default'
 }
 
+const CUSTOMER_STATUS_LABEL: Record<string, string> = {
+  active: '启用',
+  inactive: '停用',
+}
+
+function statusLabel(status?: string) {
+  if (!status) return '-'
+  return CUSTOMER_STATUS_LABEL[status] ?? status
+}
+
 export function CustomerListPage() {
   const { customers } = useCrmData()
   const [q, setQ] = useState('')
@@ -133,7 +143,7 @@ export function CustomerListPage() {
       {
         header: '状态',
         accessorKey: 'status',
-        cell: (c) => <StatusBadge variant={statusVariant(c.status)}>{c.status}</StatusBadge>,
+        cell: (c) => <StatusBadge variant={statusVariant(c.status)}>{statusLabel(c.status)}</StatusBadge>,
       },
       {
         header: '操作',
@@ -199,8 +209,8 @@ export function CustomerListPage() {
                 </Select>
                 <Select value={status} onChange={(e) => setStatus(e.target.value)}>
                   <option value="">全部状态</option>
-                  <option value="active">active</option>
-                  <option value="inactive">inactive</option>
+                  <option value="active">启用</option>
+                  <option value="inactive">停用</option>
                 </Select>
                 <Select value={sort} onChange={(e) => setSort(e.target.value)}>
                   <option value="nextFollowUpAt-asc">按下次跟进（最近优先）</option>
@@ -275,7 +285,7 @@ export function CustomerListPage() {
           <div>
             <div className="text-xs text-[var(--color-text-tertiary)]">状态（Mock）</div>
             <div className="mt-2">
-              <StatusBadge variant="success">active</StatusBadge>
+              <StatusBadge variant="success">启用</StatusBadge>
             </div>
           </div>
         </div>
@@ -287,7 +297,7 @@ export function CustomerListPage() {
           drawerCustomer ? (
             <div className="flex items-center gap-2">
               <span className="truncate">{drawerCustomer.name}</span>
-              <StatusBadge variant={statusVariant(drawerCustomer.status)}>{drawerCustomer.status}</StatusBadge>
+              <StatusBadge variant={statusVariant(drawerCustomer.status)}>{statusLabel(drawerCustomer.status)}</StatusBadge>
             </div>
           ) : (
             ''

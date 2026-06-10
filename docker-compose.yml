@@ -5,9 +5,11 @@ services:
     image: nginx:1.27-alpine
     ports:
       - "33700:80"
+      - "33721:443"
     volumes:
       - ./infra/nginx/gateway.conf:/etc/nginx/conf.d/default.conf:ro
       - ./infra/nginx/index.html:/usr/share/nginx/html/index.html:ro
+      - ./infra/nginx/certs:/etc/nginx/certs:ro
     depends_on:
       - portal-ui
       - mobile-portal-ui
@@ -254,6 +256,18 @@ services:
         NO_PROXY: ${NO_PROXY}
     ports:
       - "33703:80"
+    restart: unless-stopped
+
+  mobile-app:
+    build:
+      context: .
+      dockerfile: apps/mobile-app/Dockerfile
+      args:
+        HTTP_PROXY: ${HTTP_PROXY}
+        HTTPS_PROXY: ${HTTPS_PROXY}
+        NO_PROXY: ${NO_PROXY}
+    ports:
+      - "33715:80"
     restart: unless-stopped
 
   flowable-idm:

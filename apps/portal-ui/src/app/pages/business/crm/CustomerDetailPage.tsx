@@ -10,6 +10,16 @@ import { Input } from '../../../ui/Input'
 import { PageHeader } from '../../../ui/PageHeader'
 import { Select } from '../../../ui/Select'
 
+const CUSTOMER_STATUS_LABEL: Record<Customer['status'], string> = {
+  active: '启用',
+  inactive: '停用',
+}
+
+function statusLabel(status?: Customer['status']) {
+  if (!status) return '-'
+  return CUSTOMER_STATUS_LABEL[status] ?? status
+}
+
 function toDateTimeLocal(value?: string) {
   if (!value) return ''
   return value.replace(' ', 'T')
@@ -179,8 +189,8 @@ export function CustomerDetailPage() {
                       value={draft.status}
                       onChange={(e) => setDraft({ ...draft, status: e.target.value as Customer['status'] })}
                     >
-                      <option value="active">active</option>
-                      <option value="inactive">inactive</option>
+                      <option value="active">启用</option>
+                      <option value="inactive">停用</option>
                     </Select>
                   </div>
                 </div>
@@ -258,7 +268,7 @@ export function CustomerDetailPage() {
                 <div>
                   <div className="text-xs text-[var(--color-text-tertiary)]">状态</div>
                   <div className="mt-1">
-                    <Badge tone="neutral">{customer?.status ?? '-'}</Badge>
+                    <Badge tone="neutral">{statusLabel(customer?.status)}</Badge>
                   </div>
                 </div>
                 <div>
