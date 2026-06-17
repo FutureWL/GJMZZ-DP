@@ -28,6 +28,51 @@ docker compose ps
 docker compose down --remove-orphans
 ```
 
+## 一键状态总览（推荐）
+
+`scripts/dev-status.sh` 是一个**一站式状态仪表盘**。每次进入项目运行一下：
+
+```bash
+pnpm status                # 全量（仓库 + 运行时 + 测试 + 地址 + 账号 + 下一步建议）
+pnpm status:quick          # 快速（跳过测试部分）
+pnpm status:next           # 只看下一步建议
+pnpm status:urls           # 只看访问地址
+pnpm status:creds          # 只看账号密码
+```
+
+输出包含：
+
+- Git 状态（分支、未提交、领先/落后远程、最近 3 个提交）
+- Docker 容器运行情况（18 个服务的 up/down）
+- 关键 API 健康检查（factory-api、keycloak、flowable-rest、portal-ui...）
+- 已部署的 BPMN 流程列表
+- 测试状态（Playwright 上次是否 PASSED，提示重跑命令）
+- 全部访问地址 + 端口
+- 所有账号密码（Keycloak、Postgres、CloudBeaver、15 个测试用户）
+- **下一步建议**：根据仓库状态自动判断（工作区脏→提交，容器 down→起容器）+ CHANGELOG 顶部"下一阶段" + Backlog 候选
+
+## 账号
+
+启动后默认账号（来自 `.env`）：
+
+| 服务 | 账号 / 密码 |
+|---|---|
+| Keycloak | admin / admin |
+| Postgres 业务库 | factory / factory |
+| Postgres Keycloak 库 | keycloak / keycloak |
+| CloudBeaver | cbadmin / cbadmin |
+| MinIO | minioadmin / minioadmin |
+| Flowable REST | rest-admin / test |
+
+业务测试用户（15 个，统一密码 `Pass1234!`）：
+
+```bash
+# 一键 seed（启动后跑一次即可）
+bash apps/factory-api/scripts/role-tests/seed-keycloak-users.mjs
+```
+
+角色清单：`pnpm status:creds` 查看。
+
 ## 访问地址（默认端口）
 
 | 模块 | 地址 |

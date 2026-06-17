@@ -8,6 +8,11 @@
     "preview": "pnpm -C apps/portal-ui preview",
     "docker:up": "docker compose up -d --build",
     "docker:down": "docker compose down",
-    "docker:logs": "docker compose logs -f --tail=200"
+    "docker:logs": "docker compose logs -f --tail=200",
+    "status": "bash scripts/dev-status.sh",
+    "status:quick": "bash scripts/dev-status.sh quick",
+    "status:next": "bash scripts/dev-status.sh next",
+    "status:urls": "bash scripts/dev-status.sh urls",
+    "status:creds": "bash scripts/dev-status.sh creds"
   }
 }
