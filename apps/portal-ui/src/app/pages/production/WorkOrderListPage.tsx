@@ -77,7 +77,7 @@ export function WorkOrderListPage() {
     return workOrders.find((x) => x.id === drawerId) ?? null
   }, [drawerId])
 
-  const workOrderColumns = useMemo<DataTableColumn<(typeof pageRows)[number]>[]>(() => {
+  const workOrderColumns = useMemo<DataTableColumn<typeof workOrders[number]>[]>(() => {
     return [
       {
         header: '工单号',
@@ -135,7 +135,7 @@ export function WorkOrderListPage() {
         ),
       },
     ]
-  }, [pageRows])
+  }, [])
 
   return (
     <div>

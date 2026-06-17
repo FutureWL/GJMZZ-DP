@@ -46,7 +46,7 @@ export function DataTable<T>({
     return (
       getRowId ??
       ((item: T) => {
-        const id = (item as any)?.id
+        const id = (item as { id?: unknown })?.id
         return typeof id === 'string' ? id : JSON.stringify(item)
       })
     )
@@ -137,7 +137,7 @@ export function DataTable<T>({
                     const content = col.cell
                       ? col.cell(item)
                       : col.accessorKey
-                        ? ((item as any)[col.accessorKey as any] as ReactNode)
+                        ? ((item as Record<string, unknown>)[col.accessorKey as string] as ReactNode)
                         : null
                     return (
                       <td

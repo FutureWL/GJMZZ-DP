@@ -55,7 +55,7 @@ export function MaintenanceTicketNewPage() {
               </div>
               <div>
                 <div className="mb-1 text-xs font-semibold text-[var(--color-text-tertiary)]">优先级</div>
-                <Select value={priority} onChange={(e) => setPriority(e.target.value as any)}>
+                <Select value={priority} onChange={(e) => setPriority(e.target.value as 'low' | 'medium' | 'high' | 'critical')}>
                   <option value="low">低</option>
                   <option value="medium">中</option>
                   <option value="high">高</option>

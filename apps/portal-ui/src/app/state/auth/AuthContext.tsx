@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import { createContext, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import type { AuthState, User } from './types'
 import { apiGet, apiPut } from '../../api/client'
@@ -178,7 +179,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           email: user.email,
           avatar_text: user.avatarText,
         })
-      } catch {
+      } catch (e) {
+        console.error('[auth] failed to load profile:', e)
       }
       setState((prev) => {
         if (!prev) return prev

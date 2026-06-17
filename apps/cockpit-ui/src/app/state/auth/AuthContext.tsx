@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import { createContext, useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
 import type { AuthState, User } from './types'
 import { keycloak } from './keycloak'

@@ -72,7 +72,7 @@ export function ProductionScreen() {
                       }}
                       labelStyle={{ color: 'rgba(246,248,252,0.9)' }}
                       itemStyle={{ color: 'rgba(246,248,252,0.9)' }}
-                      formatter={(v: any) => [`${v}%`, 'OEE']}
+                      formatter={(v) => [`${v as number}%`, 'OEE']}
                     />
                     <Area type="monotone" dataKey="v" stroke="#34d399" strokeWidth={2} fill="url(#oeeFill)" />
                   </AreaChart>

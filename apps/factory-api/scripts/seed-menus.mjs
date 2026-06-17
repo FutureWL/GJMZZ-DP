@@ -30,7 +30,7 @@ const NO_EXEC = args.has('--no-exec')
 const SQL_ONLY = args.has('--sql-only')
 
 function log(msg) {
-  // eslint-disable-next-line no-console
+   
   console.log(`[seed-menus] ${msg}`)
 }
 

@@ -14,16 +14,17 @@ export function Drawer({
   onClose: () => void
   children: ReactNode
 }) {
-  if (!open) return null
-
   const [entered, setEntered] = useState(false)
 
   useEffect(() => {
+    if (!open) return
     const id = window.setTimeout(() => setEntered(true), 16)
     return () => {
       window.clearTimeout(id)
     }
-  }, [])
+  }, [open])
+
+  if (!open) return null
 
   return createPortal(
     <div className="fixed inset-0 z-50">

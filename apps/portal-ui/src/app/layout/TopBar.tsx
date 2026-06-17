@@ -39,8 +39,11 @@ export function TopBar() {
 
   const fullscreenSupported = useMemo(() => {
     if (typeof document === 'undefined') return false
+    // 全屏 API 在不同浏览器使用不同前缀(webkit/ms)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const el = document.documentElement as any
     const request = el?.requestFullscreen ?? el?.webkitRequestFullscreen ?? el?.msRequestFullscreen
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const exit = (document as any).exitFullscreen ?? (document as any).webkitExitFullscreen ?? (document as any).msExitFullscreen
     return !!request && !!exit
   }, [])
@@ -49,19 +52,25 @@ export function TopBar() {
     if (typeof document === 'undefined') return
 
     const getIsFs = () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const d = document as any
       return !!(d.fullscreenElement ?? d.webkitFullscreenElement ?? d.msFullscreenElement)
     }
 
+    // 初始同步(仅 mount 时 set 一次,不会有级联渲染)
     setIsFullscreen(getIsFs())
     const onChange = () => setIsFullscreen(getIsFs())
 
     document.addEventListener('fullscreenchange', onChange)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     document.addEventListener('webkitfullscreenchange' as any, onChange)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     document.addEventListener('msfullscreenchange' as any, onChange)
     return () => {
       document.removeEventListener('fullscreenchange', onChange)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       document.removeEventListener('webkitfullscreenchange' as any, onChange)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       document.removeEventListener('msfullscreenchange' as any, onChange)
     }
   }, [])
@@ -69,7 +78,9 @@ export function TopBar() {
   const toggleFullscreen = async () => {
     if (typeof document === 'undefined') return
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const d = document as any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const el = document.documentElement as any
     const fsEl = d.fullscreenElement ?? d.webkitFullscreenElement ?? d.msFullscreenElement
 
@@ -83,7 +94,9 @@ export function TopBar() {
       const request = el.requestFullscreen ?? el.webkitRequestFullscreen ?? el.msRequestFullscreen
       await request?.call(el)
     } catch {
-      setIsFullscreen(!!(d.fullscreenElement ?? d.webkitFullscreenElement ?? d.msFullscreenElement))
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const d2 = document as any
+      setIsFullscreen(!!(d2.fullscreenElement ?? d2.webkitFullscreenElement ?? d2.msFullscreenElement))
     }
   }
 

@@ -43,8 +43,7 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Lint (all apps, advisory — 现存代码有 150+ error,不全量抑制)
-        continue-on-error: true
+      - name: Lint (all apps,必检)
         run: pnpm -r --if-present lint
 
       - name: TypeScript check + build (factory-api)

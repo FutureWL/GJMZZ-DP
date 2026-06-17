@@ -32,7 +32,7 @@ const basicAuth = 'Basic ' + Buffer.from(`${FLOWABLE_USER}:${FLOWABLE_PASSWORD}`
 
 function log(msg, level = 'info') {
   const prefix = level === 'error' ? '✗' : level === 'warn' ? '!' : '·'
-  // eslint-disable-next-line no-console
+   
   console.log(`[seed-flowable] ${prefix} ${msg}`)
 }
 

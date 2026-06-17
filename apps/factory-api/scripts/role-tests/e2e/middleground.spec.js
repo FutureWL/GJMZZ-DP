@@ -118,6 +118,6 @@ for (const role of ROLES) {
 }
 
 function log(msg) {
-  // eslint-disable-next-line no-console
+   
   console.log(msg)
 }

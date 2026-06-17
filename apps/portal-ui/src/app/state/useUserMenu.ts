@@ -173,7 +173,8 @@ export function useUserMenu() {
             const items = DEBUG_MENU.mockBadIcon ? injectBadIcon(mock) : mock
             setState({ loading: false, error: null, data: buildMenuTree(items, getIconByName) })
             return
-          } catch {
+          } catch (mockErr) {
+            console.error('[useUserMenu] mock fallback failed:', mockErr)
           }
         }
 

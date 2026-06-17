@@ -75,7 +75,7 @@ export function useStartWorkflow() {
       } catch (e) {
         const msg = e instanceof Error ? e.message : String(e)
         setLastError(msg)
-        // eslint-disable-next-line no-console
+         
         console.warn(`[useStartWorkflow] start failed for ${input.businessKey}: ${msg}`)
         return { ok: false, businessKey: input.businessKey, error: msg }
       } finally {

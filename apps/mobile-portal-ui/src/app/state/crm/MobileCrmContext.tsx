@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import { contacts, customers, type Contact, type Customer } from '@factory/mock-data'
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
 

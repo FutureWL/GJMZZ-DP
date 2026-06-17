@@ -1,4 +1,6 @@
+/* eslint-disable react-refresh/only-export-components */
 import { createContext, useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
+import type { KeycloakOnLoad } from 'keycloak-js'
 import type { AuthState, User } from './types'
 import { keycloak } from './keycloak'
 
@@ -61,7 +63,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const initKeycloak = async () => {
       try {
         const authenticated = await keycloak.init({
-          onLoad: 'check-sso' as any,
+          onLoad: 'check-sso' as KeycloakOnLoad,
           pkceMethod: 'S256',
           checkLoginIframe: false,
           redirectUri: buildRedirectUri('/'),
@@ -79,11 +81,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
       } catch (error) {
         console.error('Keycloak init error:', error)
-        if (!mounted) return
-        setState(null)
+        if (mounted) setState(null)
       } finally {
-        if (!mounted) return
-        setIsLoading(false)
+        if (mounted) setIsLoading(false)
       }
     }
 

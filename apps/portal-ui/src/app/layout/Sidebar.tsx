@@ -2,10 +2,11 @@ import clsx from 'clsx'
 import { ChevronDown, ChevronRight, PanelLeft, PanelRight } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
+import type { ComponentType } from 'react'
 import type { MenuNode, PortalConfig } from '../config/portals'
 import { useUserMenu } from '../state/useUserMenu'
 
-type LeafItem = { id: string; label: string; to: string; icon?: any }
+type LeafItem = { id: string; label: string; to: string; icon?: ComponentType<{ className?: string }> }
 
 function flattenLeafItems(nodes: MenuNode[]): LeafItem[] {
   const out: LeafItem[] = []
@@ -283,7 +284,7 @@ export function Sidebar({
         ) : collapsed ? (
           <div className="flex flex-col gap-1">
             {flattenLeafItems(menu).map((item) => {
-              const Icon = item.icon as any
+              const Icon = item.icon
               return (
                 <NavLink
                   key={item.id}

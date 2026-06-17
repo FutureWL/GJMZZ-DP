@@ -278,6 +278,8 @@ export function CreateSalesOrderPage() {
             <div className="md:col-span-2">
               <div className="mb-1 text-xs font-semibold text-[var(--color-text-tertiary)]">客户名称</div>
               <Select
+                // react-hook-form 的 watch/setValue 返回不可 memoize 的函数
+                // eslint-disable-next-line react-hooks/incompatible-library
                 value={form.watch('customerId')}
                 onChange={(e) => form.setValue('customerId', e.target.value, { shouldValidate: true })}
               >

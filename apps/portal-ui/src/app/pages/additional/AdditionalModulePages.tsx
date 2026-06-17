@@ -417,7 +417,21 @@ export function AdditionalApplyPage() {
   const { services, createRequest } = useAdditionalData()
   const userName = auth.user?.name ?? '未登录'
 
-  if (!isCenterId(center)) {
+  // Hooks 必须在早期 return 之前调用(Rules of Hooks)
+  const [form, setForm] = useState<Record<string, string>>({})
+
+  // center 可能是无效值,但 hooks 仍需在顶部调用
+  const validCenter = isCenterId(center) ? center : null
+  const service = validCenter
+    ? services.find((s) => s.id === serviceId && s.centerId === validCenter)
+    : undefined
+
+  const missingKeys = useMemo(() => {
+    if (!service) return []
+    return service.formSchema.filter((f) => f.required && !String(form[f.key] ?? '').trim()).map((f) => f.key)
+  }, [form, service])
+
+  if (!validCenter) {
     return (
       <div>
         <PageHeader title="发起办理" description="参数错误" />
@@ -425,13 +439,10 @@ export function AdditionalApplyPage() {
     )
   }
 
-  const service = services.find((s) => s.id === serviceId && s.centerId === center)
-  const [form, setForm] = useState<Record<string, string>>({})
-
   const onSubmit = () => {
     if (!service) return
     const req = createRequest({
-      centerId: center,
+      centerId: validCenter,
       serviceId: service.id,
       applicant: userName,
       formData: form,
@@ -439,14 +450,9 @@ export function AdditionalApplyPage() {
     navigate(`/additional/requests/${encodeURIComponent(req.id)}`)
   }
 
-  const missingKeys = useMemo(() => {
-    if (!service) return []
-    return service.formSchema.filter((f) => f.required && !String(form[f.key] ?? '').trim()).map((f) => f.key)
-  }, [form, service])
-
   return (
     <div>
-      <PageHeader title={service ? `发起：${service.name}` : '发起办理'} description={`${buildCenterTitle(center)} · 在线办理`} />
+      <PageHeader title={service ? `发起：${service.name}` : '发起办理'} description={`${buildCenterTitle(validCenter)} · 在线办理`} />
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         <Card className="lg:col-span-2">
           <CardHeader>
@@ -1039,7 +1045,29 @@ export function AdditionalAdminContentsPage() {
   const { center } = useParams()
   const { contents, upsertContent, deleteContent, setContentPinned } = useAdditionalData()
 
-  if (!isCenterId(center)) {
+  // Hooks 必须在早期 return 之前调用(Rules of Hooks)
+  // 用 userSelectedId 存用户选择的 ID,实际生效的 selectedId 派生出来
+  const [userSelectedId, setUserSelectedId] = useState<string | null>(null)
+  const [userDraft, setUserDraft] = useState<AdditionalContent | null>(null)
+
+  // center 可能是无效值,hooks 仍需在顶部调用
+  const validCenter = isCenterId(center) ? center : null
+  const rows = validCenter
+    ? contents
+        .filter((c) => c.centerId === validCenter)
+        .sort(
+          (a, b) =>
+            (b.pinned === true ? 1 : 0) - (a.pinned === true ? 1 : 0) || b.createdAt.localeCompare(a.createdAt),
+        )
+    : []
+
+  // 派生: user 选择有效用 user 的,否则用第一条;草稿同理
+  const selectedId =
+    userSelectedId && rows.some((r) => r.id === userSelectedId)
+      ? userSelectedId
+      : rows[0]?.id ?? null
+
+  if (!validCenter) {
     return (
       <div>
         <PageHeader title="内容管理" description="参数错误" />
@@ -1047,41 +1075,42 @@ export function AdditionalAdminContentsPage() {
     )
   }
 
-  const rows = contents
-    .filter((c) => c.centerId === center)
-    .sort((a, b) => (b.pinned === true ? 1 : 0) - (a.pinned === true ? 1 : 0) || b.createdAt.localeCompare(a.createdAt))
-
-  const [selectedId, setSelectedId] = useState<string | null>(rows[0]?.id ?? null)
   const selected = rows.find((x) => x.id === selectedId) ?? null
-
-  const [draft, setDraft] = useState<AdditionalContent>(() => {
-    if (selected) return selected
-    return { id: `content-${center}-001`, centerId: center, type: 'notice', title: '', body: '', createdAt: '' }
-  })
+  const draft =
+    userDraft && selected && userDraft.id === selected.id
+      ? userDraft
+      : selected ?? {
+          id: `content-${validCenter}-001`,
+          centerId: validCenter,
+          type: 'notice',
+          title: '',
+          body: '',
+          createdAt: '',
+        }
 
   const select = (id: string) => {
     const item = rows.find((x) => x.id === id)
     if (!item) return
-    setSelectedId(id)
-    setDraft(item)
+    setUserSelectedId(id)
+    setUserDraft(item)
   }
 
   const newItem = () => {
-    const id = `content-${center}-${Math.floor(Math.random() * 900 + 100)}`
-    setSelectedId(null)
-    setDraft({ id, centerId: center, type: 'notice', title: '', body: '', createdAt: '' })
+    const id = `content-${validCenter}-${Math.floor(Math.random() * 900 + 100)}`
+    setUserSelectedId(null)
+    setUserDraft({ id, centerId: validCenter, type: 'notice', title: '', body: '', createdAt: '' })
   }
 
   const save = () => {
     const createdAt = draft.createdAt || new Date().toISOString().slice(0, 16).replace('T', ' ')
-    upsertContent({ ...draft, centerId: center, createdAt })
-    setSelectedId(draft.id)
+    upsertContent({ ...draft, centerId: validCenter, createdAt })
+    setUserSelectedId(draft.id)
   }
 
   const remove = () => {
     if (!selectedId) return
     deleteContent(selectedId)
-    setSelectedId(null)
+    setUserSelectedId(null)
     newItem()
   }
 
@@ -1092,7 +1121,7 @@ export function AdditionalAdminContentsPage() {
 
   return (
     <div>
-      <PageHeader title={`${buildCenterTitle(center)} · 内容管理`} description="通知/制度/FAQ 发布与维护（示例）" />
+      <PageHeader title={`${buildCenterTitle(validCenter)} · 内容管理`} description="通知/制度/FAQ 发布与维护（示例）" />
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         <Card className="lg:col-span-2">
           <CardHeader>
@@ -1131,7 +1160,7 @@ export function AdditionalAdminContentsPage() {
             <div className="space-y-3">
               <div>
                 <div className="mb-1 text-xs text-[var(--color-text-tertiary)]">类型</div>
-                <Select value={draft.type} onChange={(e) => setDraft((p) => ({ ...p, type: e.target.value as AdditionalContentType }))}>
+                <Select value={draft.type} onChange={(e) => setUserDraft((p) => p ? ({ ...p, type: e.target.value as AdditionalContentType }) : p)}>
                   <option value="notice">通知</option>
                   <option value="policy">制度</option>
                   <option value="faq">FAQ</option>
@@ -1139,11 +1168,11 @@ export function AdditionalAdminContentsPage() {
               </div>
               <div>
                 <div className="mb-1 text-xs text-[var(--color-text-tertiary)]">标题</div>
-                <Input value={draft.title} onChange={(e) => setDraft((p) => ({ ...p, title: e.target.value }))} />
+                <Input value={draft.title} onChange={(e) => setUserDraft((p) => p ? ({ ...p, title: e.target.value }) : p)} />
               </div>
               <div>
                 <div className="mb-1 text-xs text-[var(--color-text-tertiary)]">正文</div>
-                <Textarea rows={8} value={draft.body} onChange={(e) => setDraft((p) => ({ ...p, body: e.target.value }))} />
+                <Textarea rows={8} value={draft.body} onChange={(e) => setUserDraft((p) => p ? ({ ...p, body: e.target.value }) : p)} />
               </div>
               <div className="flex items-center gap-2">
                 <Button variant="primary" className="flex-1" onClick={save} disabled={!draft.title.trim()}>
@@ -1176,7 +1205,25 @@ export function AdditionalAdminPermissionsPage() {
   const { center } = useParams()
   const { members, roles, roleBindings, addRoleBinding, removeRoleBinding } = useAdditionalData()
 
-  if (!isCenterId(center)) {
+  // Hooks 必须在早期 return 之前调用
+  // 用 userMemberId 存用户选择,实际生效的 memberId 派生出来
+  const [userMemberId, setUserMemberId] = useState<string | null>(null)
+  const [roleId, setRoleId] = useState<AdditionalRoleId>('additional:center_agent')
+
+  // center 可能是无效值,hooks 仍需在顶部调用
+  const validCenter = isCenterId(center) ? center : null
+  const rows = validCenter
+    ? roleBindings
+        .filter((b) => b.scopeCenterId === validCenter || b.scopeCenterId === 'all')
+        .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+    : []
+
+  // 派生: user 选择有效用 user 的,否则第一个成员
+  const memberId = (userMemberId && members.some((m) => m.id === userMemberId))
+    ? userMemberId
+    : members[0]?.id ?? ''
+
+  if (!validCenter) {
     return (
       <div>
         <PageHeader title="权限配置" description="参数错误" />
@@ -1184,21 +1231,14 @@ export function AdditionalAdminPermissionsPage() {
     )
   }
 
-  const rows = roleBindings
-    .filter((b) => b.scopeCenterId === center || b.scopeCenterId === 'all')
-    .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
-
-  const [memberId, setMemberId] = useState(members[0]?.id ?? '')
-  const [roleId, setRoleId] = useState<AdditionalRoleId>('additional:center_agent')
-
   const add = () => {
     if (!memberId) return
-    addRoleBinding({ memberId, roleId, scopeCenterId: center })
+    addRoleBinding({ memberId, roleId, scopeCenterId: validCenter })
   }
 
   return (
     <div>
-      <PageHeader title={`${buildCenterTitle(center)} · 权限配置`} description="专员授权与角色范围（示例）" />
+      <PageHeader title={`${buildCenterTitle(validCenter)} · 权限配置`} description="专员授权与角色范围（示例）" />
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         <Card className="lg:col-span-2">
           <CardHeader>
@@ -1259,7 +1299,7 @@ export function AdditionalAdminPermissionsPage() {
             <div className="space-y-3">
               <div>
                 <div className="mb-1 text-xs text-[var(--color-text-tertiary)]">成员</div>
-                <Select value={memberId} onChange={(e) => setMemberId(e.target.value)}>
+                <Select value={memberId} onChange={(e) => setUserMemberId(e.target.value)}>
                   {members.map((m) => (
                     <option key={m.id} value={m.id}>
                       {m.name}（{m.department}）

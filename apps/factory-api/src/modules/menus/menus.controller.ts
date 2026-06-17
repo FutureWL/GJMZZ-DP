@@ -38,7 +38,7 @@ export class MenusController {
     //           2) public.profile.position (业务侧,通过 PUT /profiles/me 设置)
     // 任一存在即生效;profile.position 缺失时仅用 JWT roles
     const jwtRoles = parseRealmRoles(req.user?.realm_access)
-    let merged: string[] = [...jwtRoles]
+    const merged: string[] = [...jwtRoles]
     let profilePosition: string | null = null
     try {
       const profile = await this.profiles.getByUserId(userId)
