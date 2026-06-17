@@ -63,3 +63,56 @@ export async function getWorkflowProcessHistory(token: string, processInstanceId
     token,
   )
 }
+
+/**
+ * L4:按 businessKey 查当前 active task(业务详情页审批按钮用)
+ */
+export async function getActiveTaskByBusinessKey(
+  token: string,
+  businessKey: string,
+): Promise<{
+  task: Record<string, unknown> | null
+  processInstance: Record<string, unknown> | null
+  reason?: string
+}> {
+  return await apiGet(
+    `/workflow/process-instances/by-business-key/${encodeURIComponent(businessKey)}/active-task`,
+    token,
+  )
+}
+
+// -------- L2: 通用审批 BPMN 部署/查询 --------
+
+export type WorkflowProcessDefinition = {
+  id: string
+  key: string
+  name: string
+  version: number
+  deploymentId: string
+}
+
+export async function listProcessDefinitions(token: string) {
+  return await apiGet<WorkflowProcessDefinition[]>(`/workflow/process-definitions`, token)
+}
+
+export async function deployProcessDefinition(
+  token: string,
+  body: { name: string; bpmnXml: string },
+) {
+  return await apiPost<WorkflowProcessDefinition>(
+    `/workflow/process-definitions`,
+    token,
+    body,
+  )
+}
+
+export async function startProcessInstance(
+  token: string,
+  body: { businessKey: string; processDefinitionKey?: string; variables?: Record<string, unknown> },
+) {
+  return await apiPost<Record<string, unknown>>(
+    `/workflow/instances`,
+    token,
+    body,
+  )
+}

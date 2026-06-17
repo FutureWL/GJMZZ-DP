@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:flowable="http://flowable.org/bpmn"
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+             xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
+             xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI"
+             typeLanguage="http://www.w3.org/2001/XMLSchema"
+             expressionLanguage="http://www.w3.org/1999/XPath"
+             targetNamespace="http://factory.gjmzz.dp/bpmn/simple-approval">
+
+  <!--
+    simple-approval-v1:通用单步审批
+    适用:管理域业务单据(费用/PR/合同/供应商准入)统一走这个流程
+    输入: businessKey(业务单据 id)、initiatorUserId(发起人)
+    行为: 候选组 candidateGroups = [approver, manager]
+          - 同意:写 approved=true,end
+          - 退回:写 backToInitiator=true,end
+    关联: factory-api /api/workflow/instances 启动;
+          /api/workflow/tasks/:id/complete 办理
+  -->
+
+  <process id="simple_approval_v1" name="Simple Approval" isExecutable="true">
+
+    <startEvent id="start" name="提交"/>
+
+    <userTask id="approve_task" name="审批" flowable:candidateGroups="approver,manager">
+      <documentation>
+        单步审批任务。候选人组:approver / manager。
+        通过 task.complete 提交 { action: APPROVE | BACK, comment }。
+      </documentation>
+    </userTask>
+
+    <endEvent id="end" name="结束"/>
+
+    <sequenceFlow id="flow1" sourceRef="start" targetRef="approve_task"/>
+    <sequenceFlow id="flow2" sourceRef="approve_task" targetRef="end"/>
+  </process>
+
+  <bpmndi:BPMNDiagram id="BPMNDiagram_simple_approval_v1">
+    <bpmndi:BPMNPlane bpmnElement="simple_approval_v1" id="BPMNPlane_simple_approval_v1">
+      <bpmndi:BPMNShape bpmnElement="start" id="BPMNShape_start">
+        <omgdc:Bounds x="120" y="120" width="40" height="40"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="approve_task" id="BPMNShape_approve_task">
+        <omgdc:Bounds x="220" y="100" width="120" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="end" id="BPMNShape_end">
+        <omgdc:Bounds x="400" y="120" width="40" height="40"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="160" y="140"/>
+        <omgdi:waypoint x="220" y="140"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="340" y="140"/>
+        <omgdi:waypoint x="400" y="140"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

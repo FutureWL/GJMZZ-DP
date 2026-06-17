@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:flowable="http://flowable.org/bpmn"
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+             xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
+             xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI"
+             typeLanguage="http://www.w3.org/2001/XMLSchema"
+             expressionLanguage="http://www.w3.org/1999/XPath"
+             targetNamespace="http://factory.gjmzz.dp/bpmn/qc-exception">
+
+  <!--
+    qc-exception-v1:质量异常处理流程
+    适用:IncidentDetailPage 提交时启动
+    节点: 提交 → 隔离(quality)→ 评审(quality_manager)→ 处置(plant_manager)→ 结束
+    候选组:quality / quality_manager / plant_manager
+    变量: businessKey(incidentId)、initiatorUserId
+  -->
+
+  <process id="qc_exception_v1" name="QC Exception" isExecutable="true">
+
+    <startEvent id="start" name="提交质量异常"/>
+
+    <userTask id="isolate" name="隔离" flowable:candidateGroups="quality">
+      <documentation>对异常批次/序列进行物理隔离,标记 hold</documentation>
+    </userTask>
+
+    <userTask id="review" name="评审" flowable:candidateGroups="quality_manager,plant_manager">
+      <documentation>根因评审,通过 {action: APPROVE} 同意继续到处置,{action: BACK} 退回隔离</documentation>
+    </userTask>
+
+    <userTask id="dispose" name="处置" flowable:candidateGroups="plant_manager">
+      <documentation>返工/报废/让步,处理完成后 end</documentation>
+    </userTask>
+
+    <endEvent id="end" name="结束"/>
+
+    <sequenceFlow id="flow_start_isolate" sourceRef="start" targetRef="isolate"/>
+    <sequenceFlow id="flow_isolate_review" sourceRef="isolate" targetRef="review"/>
+    <sequenceFlow id="flow_review_dispose" sourceRef="review" targetRef="dispose"/>
+    <sequenceFlow id="flow_dispose_end" sourceRef="dispose" targetRef="end"/>
+  </process>
+
+  <bpmndi:BPMNDiagram id="BPMNDiagram_qc_exception_v1">
+    <bpmndi:BPMNPlane bpmnElement="qc_exception_v1" id="BPMNPlane_qc_exception_v1">
+      <bpmndi:BPMNShape bpmnElement="start" id="BPMNShape_start">
+        <omgdc:Bounds x="80" y="120" width="40" height="40"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="isolate" id="BPMNShape_isolate">
+        <omgdc:Bounds x="180" y="100" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="review" id="BPMNShape_review">
+        <omgdc:Bounds x="340" y="100" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="dispose" id="BPMNShape_dispose">
+        <omgdc:Bounds x="500" y="100" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="end" id="BPMNShape_end">
+        <omgdc:Bounds x="660" y="120" width="40" height="40"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNEdge bpmnElement="flow_start_isolate" id="BPMNEdge_flow_start_isolate">
+        <omgdi:waypoint x="120" y="140"/>
+        <omgdi:waypoint x="180" y="140"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow_isolate_review" id="BPMNEdge_flow_isolate_review">
+        <omgdi:waypoint x="280" y="140"/>
+        <omgdi:waypoint x="340" y="140"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow_review_dispose" id="BPMNEdge_flow_review_dispose">
+        <omgdi:waypoint x="440" y="140"/>
+        <omgdi:waypoint x="500" y="140"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow_dispose_end" id="BPMNEdge_flow_dispose_end">
+        <omgdi:waypoint x="600" y="140"/>
+        <omgdi:waypoint x="660" y="140"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import type { ExpenseClaimLine } from '../../../mock/models'
 import { useAuth } from '../../../state/auth/useAuth'
 import { useExpenseFlow } from '../../../state/expense/ExpenseFlowContext'
+import { useStartWorkflow } from '../../../state/workflow/useStartWorkflow'
 import { Button } from '../../../ui/Button'
 import { Card, CardBody, CardHeader, CardTitle } from '../../../ui/Card'
 import { Input } from '../../../ui/Input'
@@ -16,6 +17,7 @@ function newLineId() {
 export function ExpenseClaimNewPage() {
   const auth = useAuth()
   const flow = useExpenseFlow()
+  const startWf = useStartWorkflow()
   const nav = useNavigate()
 
   const [title, setTitle] = useState('')
@@ -164,7 +166,7 @@ export function ExpenseClaimNewPage() {
                 </Button>
                 <Button
                   variant="primary"
-                  onClick={() => {
+                  onClick={async () => {
                     const created = flow.createDraft({
                       title,
                       departmentId,
@@ -177,6 +179,12 @@ export function ExpenseClaimNewPage() {
                       lines,
                     })
                     flow.submit(created.id)
+                    // L3:同时启动 Flowable simple_approval_v1,businessKey=报销单 id
+                    void startWf.start({
+                      businessKey: created.id,
+                      businessType: 'expense_claim',
+                      variables: { amountTotal, claimType, departmentId },
+                    })
                     nav(`/management/expense/claims/${encodeURIComponent(created.id)}`)
                   }}
                 >
@@ -184,7 +192,9 @@ export function ExpenseClaimNewPage() {
                 </Button>
               </div>
               <div className="text-xs text-[var(--color-text-tertiary)]">
-                提交后会在“审批中心”生成待办（mock），并按项目/成本中心/部门/财务/出纳顺序流转。
+                提交后会在“审批中心”生成待办（mock + Flowable 真实），并按项目/成本中心/部门/财务/出纳顺序流转。
+                {startWf.isStarting ? <span className="ml-2">· 启动流程中…</span> : null}
+                {startWf.lastError ? <span className="ml-2 text-[var(--color-danger,#dc2626)]">· 启动失败:{startWf.lastError}</span> : null}
               </div>
             </div>
           </CardBody>

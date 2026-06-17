@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useContractFlow } from '../../../state/contract/ContractFlowContext'
+import { useStartWorkflow } from '../../../state/workflow/useStartWorkflow'
 import { Button } from '../../../ui/Button'
 import { Card, CardBody, CardHeader, CardTitle } from '../../../ui/Card'
 import { Input } from '../../../ui/Input'
@@ -9,6 +10,7 @@ import { Select } from '../../../ui/Select'
 
 export function ContractReviewNewPage() {
   const flow = useContractFlow()
+  const startWf = useStartWorkflow()
   const nav = useNavigate()
 
   const [title, setTitle] = useState('')
@@ -172,6 +174,12 @@ export function ContractReviewNewPage() {
                       riskLevel,
                     })
                     flow.submit(created.id)
+                    // L3:同时启动 Flowable simple_approval_v1,businessKey=合同 id
+                    void startWf.start({
+                      businessKey: created.id,
+                      businessType: 'contract_review',
+                      variables: { amountTotal, contractType, riskLevel },
+                    })
                     nav(`/management/contract/reviews/${encodeURIComponent(created.id)}`)
                   }}
                 >

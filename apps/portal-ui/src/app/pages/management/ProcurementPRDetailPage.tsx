@@ -1,17 +1,72 @@
 import { Link, useParams } from 'react-router-dom'
-import { Badge } from '../../ui/Badge'
+import { Badge, type Tone } from '../../ui/Badge'
 import { Button } from '../../ui/Button'
 import { Card, CardBody, CardHeader, CardTitle } from '../../ui/Card'
 import { PageHeader } from '../../ui/PageHeader'
 import { Input } from '../../ui/Input'
+import { WorkflowInstanceCard } from '../../ui/WorkflowInstanceCard'
 import { useState } from 'react'
 import { useProcurementFlow } from '../../state/procurement/ProcurementFlowContext'
+import { useBusinessWorkflowStatus, type DerivedStatus } from '../../state/workflow/useBusinessWorkflowStatus'
+
+function derivedLabel(s: DerivedStatus): string {
+  if (s === 'not_started') return '未启动'
+  if (s === 'in_review') return '审批中'
+  if (s === 'approved') return '已通过'
+  if (s === 'rejected') return '已驳回'
+  if (s === 'suspended') return '已挂起'
+  return '未知'
+}
+function derivedTone(s: DerivedStatus): Tone {
+  if (s === 'in_review' || s === 'not_started') return 'info'
+  if (s === 'approved') return 'success'
+  if (s === 'rejected' || s === 'suspended') return 'warning'
+  return 'neutral'
+}
 
 export function ProcurementPRDetailPage() {
   const { id } = useParams()
   const flow = useProcurementFlow()
   const pr = id ? flow.getRequest(id) : undefined
   const [note, setNote] = useState('')
+  const [actionError, setActionError] = useState<string | null>(null)
+  const [isActing, setIsActing] = useState(false)
+
+  const wf = useBusinessWorkflowStatus(pr?.id ?? '')
+
+  const showActionButtons = wf.hasProcess && wf.derivedStatus === 'in_review' && wf.canAct
+  const statusTone = wf.hasProcess ? derivedTone(wf.derivedStatus) : (pr?.status === 'approved' ? 'success' : pr?.status === 'rejected' ? 'error' : pr?.status === 'in_review' ? 'info' : 'neutral')
+  const statusLabel = wf.hasProcess ? derivedLabel(wf.derivedStatus) : (pr?.status ?? '-')
+
+  const onApprove = async () => {
+    if (!pr) return
+    setIsActing(true)
+    setActionError(null)
+    try {
+      await wf.approve(note || undefined)
+      setNote('')
+    } catch (e) {
+      setActionError(e instanceof Error ? e.message : '操作失败')
+    } finally {
+      setIsActing(false)
+    }
+  }
+  const onBack = async () => {
+    if (!pr) return
+    setIsActing(true)
+    setActionError(null)
+    try {
+      await wf.back(note || undefined)
+      setNote('')
+    } catch (e) {
+      setActionError(e instanceof Error ? e.message : '操作失败')
+    } finally {
+      setIsActing(false)
+    }
+  }
+
+  // 抑制未使用变量警告(在没动作按钮时不用)
+  void actionError
 
   return (
     <div>
@@ -23,34 +78,13 @@ export function ProcurementPRDetailPage() {
             <Link to="/management/approval?from=procurement-pr">
               <Button variant="secondary">审批中心</Button>
             </Link>
-            {pr?.status === 'in_review' ? (
+            {showActionButtons ? (
               <>
-                <Button
-                  variant="primary"
-                  onClick={() => {
-                    flow.approve(pr.id, note || undefined)
-                    setNote('')
-                  }}
-                >
+                <Button variant="primary" onClick={onApprove} disabled={isActing}>
                   同意
                 </Button>
-                <Button
-                  variant="secondary"
-                  onClick={() => {
-                    flow.returnToApplicant(pr.id, note || undefined)
-                    setNote('')
-                  }}
-                >
-                  退回修改
-                </Button>
-                <Button
-                  variant="danger"
-                  onClick={() => {
-                    flow.reject(pr.id, note || undefined)
-                    setNote('')
-                  }}
-                >
-                  驳回
+                <Button variant="danger" onClick={onBack} disabled={isActing}>
+                  退回发起人
                 </Button>
               </>
             ) : null}
@@ -71,10 +105,9 @@ export function ProcurementPRDetailPage() {
               </div>
               <div>
                 <div className="text-xs text-[var(--color-text-tertiary)]">状态</div>
-                <div className="mt-1">
-                  <Badge tone={pr?.status === 'approved' ? 'success' : pr?.status === 'rejected' ? 'error' : pr?.status === 'in_review' ? 'info' : 'neutral'}>
-                    {pr?.status ?? '-'}
-                  </Badge>
+                <div className="mt-1 flex items-center gap-2">
+                  <Badge tone={statusTone}>{statusLabel}</Badge>
+                  {wf.hasProcess ? <span className="text-xs text-[var(--color-text-tertiary)]">（来自 Flowable）</span> : null}
                 </div>
               </div>
               <div>
@@ -107,7 +140,7 @@ export function ProcurementPRDetailPage() {
 
             <div className="mt-4">
               <div className="mb-1 text-xs font-semibold text-[var(--color-text-tertiary)]">处理意见（可选）</div>
-              <Input value={note} onChange={(e) => setNote(e.target.value)} placeholder="同意/退回/驳回原因（mock）" />
+              <Input value={note} onChange={(e) => setNote(e.target.value)} placeholder="同意/退回原因" />
             </div>
           </CardBody>
         </Card>
@@ -201,6 +234,8 @@ export function ProcurementPRDetailPage() {
           </div>
         </CardBody>
       </Card>
+
+      {pr ? <div className="mt-4"><WorkflowInstanceCard businessKey={pr.id} businessType="procurement_pr" /></div> : null}
     </div>
   )
 }

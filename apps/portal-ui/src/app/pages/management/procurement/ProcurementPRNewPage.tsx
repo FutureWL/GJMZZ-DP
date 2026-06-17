@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import type { ProcurementRequestLine } from '../../../mock/models'
 import { useProcurementFlow } from '../../../state/procurement/ProcurementFlowContext'
+import { useStartWorkflow } from '../../../state/workflow/useStartWorkflow'
 import { Button } from '../../../ui/Button'
 import { Card, CardBody, CardHeader, CardTitle } from '../../../ui/Card'
 import { Input } from '../../../ui/Input'
@@ -14,6 +15,7 @@ function newLineId() {
 
 export function ProcurementPRNewPage() {
   const flow = useProcurementFlow()
+  const startWf = useStartWorkflow()
   const nav = useNavigate()
 
   const [title, setTitle] = useState('')
@@ -137,6 +139,12 @@ export function ProcurementPRNewPage() {
                       lines,
                     })
                     flow.submit(created.id)
+                    // L3:同时启动 Flowable simple_approval_v1,businessKey=PR id
+                    void startWf.start({
+                      businessKey: created.id,
+                      businessType: 'procurement_pr',
+                      variables: { amountTotal, departmentId },
+                    })
                     nav(`/management/procurement/pr/${encodeURIComponent(created.id)}`)
                   }}
                 >
