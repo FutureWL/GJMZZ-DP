@@ -18,8 +18,22 @@
       "implicitFlowEnabled": false,
       "serviceAccountsEnabled": false,
       "frontchannelLogout": true,
-      "redirectUris": ["http://localhost:33700/portal/*", "http://localhost:33701/*"],
-      "webOrigins": ["http://localhost:33700", "http://localhost:33701"]
+      "redirectUris": [
+        "http://localhost:33700/portal/*",
+        "http://localhost:33701/*",
+        "http://127.0.0.1:33700/portal/*",
+        "http://127.0.0.1:33701/*",
+        "http://192.168.3.104:33700/portal/*",
+        "http://192.168.3.104:33701/*"
+      ],
+      "webOrigins": [
+        "http://localhost:33700",
+        "http://localhost:33701",
+        "http://127.0.0.1:33700",
+        "http://127.0.0.1:33701",
+        "http://192.168.3.104:33700",
+        "http://192.168.3.104:33701"
+      ]
     },
     {
       "clientId": "mobile-portal-ui",
@@ -32,8 +46,8 @@
       "implicitFlowEnabled": false,
       "serviceAccountsEnabled": false,
       "frontchannelLogout": true,
-      "redirectUris": ["http://localhost:33700/m/*", "http://localhost:33702/*", "http://localhost:33702/m/*"],
-      "webOrigins": ["http://localhost:33700", "http://localhost:33702"]
+      "redirectUris": ["http://localhost:33700/m/*", "http://localhost:33702/*", "http://localhost:33702/m/*", "http://127.0.0.1:33700/m/*", "http://127.0.0.1:33702/*", "http://127.0.0.1:33702/m/*"],
+      "webOrigins": ["http://localhost:33700", "http://localhost:33702", "http://127.0.0.1:33700", "http://127.0.0.1:33702"]
     },
     {
       "clientId": "cockpit-ui",
@@ -46,8 +60,8 @@
       "implicitFlowEnabled": false,
       "serviceAccountsEnabled": false,
       "frontchannelLogout": true,
-      "redirectUris": ["http://localhost:33700/cockpit/*", "http://localhost:33703/*", "http://localhost:33703/cockpit/*"],
-      "webOrigins": ["http://localhost:33700", "http://localhost:33703"]
+      "redirectUris": ["http://localhost:33700/cockpit/*", "http://localhost:33703/*", "http://localhost:33703/cockpit/*", "http://127.0.0.1:33700/cockpit/*", "http://127.0.0.1:33703/*", "http://127.0.0.1:33703/cockpit/*"],
+      "webOrigins": ["http://localhost:33700", "http://localhost:33703", "http://127.0.0.1:33700", "http://127.0.0.1:33703"]
     },
     {
       "clientId": "mobile-app",
@@ -66,7 +80,13 @@
         "http://localhost:33715/m/app/*",
         "http://localhost:5181/*",
         "http://localhost:5182/*",
-        "http://localhost:5183/*"
+        "http://localhost:5183/*",
+        "http://127.0.0.1:33700/m/app/*",
+        "http://127.0.0.1:33715/*",
+        "http://127.0.0.1:33715/m/app/*",
+        "http://127.0.0.1:5181/*",
+        "http://127.0.0.1:5182/*",
+        "http://127.0.0.1:5183/*"
       ],
       "webOrigins": [
         "http://localhost:33700",

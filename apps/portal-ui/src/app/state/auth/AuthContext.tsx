@@ -1,7 +1,7 @@
 import { createContext, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import type { AuthState, User } from './types'
 import { apiGet, apiPut } from '../../api/client'
-import { keycloak } from './keycloak'
+import { keycloak, supportsSubtleCrypto } from './keycloak'
 
 export interface AuthContextValue {
   token: string | null
@@ -97,7 +97,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       try {
         const authenticated = await keycloak.init({
           onLoad: 'check-sso',
-          pkceMethod: 'S256',
+          // secure context (localhost / https) 才能 PKCE; LAN IP 等走 false
+          pkceMethod: supportsSubtleCrypto ? 'S256' : false,
           checkLoginIframe: false,
         })
         if (!mounted) return
@@ -108,7 +109,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         } else {
           setState(null)
         }
-      } catch {
+      } catch (e) {
+        console.error('[auth] keycloak.init failed', e)
         if (mounted) setState(null)
       } finally {
         if (mounted) setIsLoading(false)

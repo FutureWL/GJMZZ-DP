@@ -117,8 +117,9 @@ export function LoginPage() {
                     setLoading(true)
                     try {
                       await auth.signInWithSSO(next)
-                    } catch {
-                      setError('SSO 登录失败')
+                    } catch (e) {
+                      console.error('[sso-login] error', e)
+                      setError(e instanceof Error ? `SSO 登录失败: ${e.message}` : 'SSO 登录失败')
                     } finally {
                       setLoading(false)
                     }
