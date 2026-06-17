@@ -129,7 +129,8 @@ complete_task() {
 # 拉菜单
 get_menu() {
   local token="$1"
-  curl -sS -m 5 "$API_BASE/menus/me" -H "Authorization: Bearer $token"
+  curl -sS -m 5 "$API_BASE/menus/me" -H "Authorization: Bearer $token" | \
+    python3 -c 'import json,sys;d=json.load(sys.stdin); print(json.dumps(d.get("items", d if isinstance(d, list) else [])))'
 }
 
 # 简单断言:响应中包含某字符串
@@ -143,6 +144,19 @@ expect_contains() {
     echo "  ❌ $label: NOT contains '$needle'"
     echo "  raw: $haystack"
     return 1
+  fi
+}
+
+# 简单断言:响应中不含某字符串
+expect_not_contains() {
+  local label="$1"
+  local haystack="$2"
+  local needle="$3"
+  if echo "$haystack" | grep -q "$needle"; then
+    echo "  ❌ $label: 仍包含 '$needle'(不应可见)"
+    return 1
+  else
+    echo "  ✅ $label: 不含 '$needle'"
   fi
 }
 

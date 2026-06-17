@@ -35,7 +35,7 @@ log "3) 菜单(设备运维)"
 MENU=$(get_menu "$TOKEN")
 N=$(count_json "$MENU")
 log "  菜单条目数: $N"
-[ "$N" -ge 40 ] || fail "菜单 < 40"
+[ "$N" -ge 20 ] || fail "菜单 < 20"
 expect_contains "菜单-设备监控"   "$MENU" '"/equipment/monitoring"'
 expect_contains "菜单-维修工单"   "$MENU" '"/equipment/workorders"'
 expect_contains "菜单-维修看板"   "$MENU" '"/equipment/dashboard"'

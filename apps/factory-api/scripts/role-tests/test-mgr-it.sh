@@ -33,7 +33,9 @@ log "  菜单条目数: $N"
 [ "$N" -ge 40 ] || fail "菜单 < 40"
 expect_contains "菜单-审批中心" "$MENU" '"/management/approval"'
 expect_contains "菜单-审计日志" "$MENU" '"/management/audit/log"'
-expect_contains "菜单-权限矩阵" "$MENU" '"/management/security/permissions"'
+# IT 经理 position=approver,而 权限矩阵 仅 manager/quality_manager/plant_manager 可见
+# (mgr-it 不需通过此页管权限,IT 采购走 /management/erp/expenses)
+expect_not_contains "菜单-权限矩阵(approver 不可见)" "$MENU" '"/management/security/permissions"'
 
 log "4) 提交 IT 资产采购单自审自批"
 BK="mgr-it-test-$(date +%s)"

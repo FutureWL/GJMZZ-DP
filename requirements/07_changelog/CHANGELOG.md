@@ -5,6 +5,61 @@
 
 ---
 
+## 2026-06-17  ·  角色 → 菜单可见映射(Backlog A 完成)
+
+- **类型**:新增功能 + 体验优化
+- **作者**:@dev
+- **影响范围**:factory-api menus 模块 + portal-ui useUserMenu + sidebar + 15 个 role-tests
+- **业务背景**:之前 15 角色登录后都看到全部 52 条菜单,inspector 看见 `/equipment/workorders`、tech 看见 `/sales/order`,不符合"按岗位看菜单"的常识。CHANGELOG 上一条"下一阶段"提到角色权限细化,Backlog 列了"portal-ui 增加角色→菜单可见映射",本次完成
+- **变更内容**:
+  - **后端**
+    - `MenusController.getMyMenu`:合并 `JWT.realm_access.roles` ∪ `public.profile.position` 作为角色集合
+    - 注入 `ProfilesService`(新加 `MenusModule.imports = [ProfilesModule]` + `ProfilesModule.exports = [ProfilesService]`)
+    - 响应改为 `{ items: ApiMenuItem[], profilePosition, count, roles }`(原本是 flat 数组)
+  - **seed**
+    - 新建 `apps/factory-api/scripts/menu-required-roles.mjs`:维护 36 条菜单的 `id → requiredRoles[]` 映射
+    - `seed-menus.mjs` 在生成 SQL 前叠加映射,生成 36 条带 requiredRoles + 16 条容器无限制
+    - 同步生成 `infra/db-init/factory-03-menus.sql`(容器启动自带)
+  - **前端**
+    - `useUserMenu.ts` 加 `extractItems` 适配新旧响应(向后兼容)
+    - `utils/menu.ts` 的 `buildMenuTree` 跳过空容器(无可见子项的分类自动隐藏)
+- **角色枚举 → 可见菜单数**(基线):
+  - `quality`(inspector):24 条叶子 / 5 个菜单组
+  - `plant_manager`(tech / mgr-equipment):29
+  - `quality_manager`(mgr-quality):~31
+  - `approver`(CEO/VP/mgr-procurement/mgr-it/worker-leader/planner/warehouse):51
+  - `manager`(mgr-production):52(全)
+- **测试**:
+  - 新增 `scripts/role-tests/verify-menu-visibility.sh`:5 角色 × 期望见/隐藏断言,**全过**
+  - 新增 `e2e/role-menu-visibility.spec.js`:5 个 Playwright 测试(走真实 Keycloak 登录 + DOM 抓 `a[href]`),**全过 5/5**,5 张截图
+  - 适配原有 15 个 role-tests:
+    - `common.sh` 加 `expect_not_contains`
+    - `test-mgr-quality.sh` / `test-mgr-equipment.sh` / `test-inspector.sh` / `test-tech.sh`:阈值 40→20(quality/plant_manager 看见的少)
+    - `test-mgr-it.sh`:`权限矩阵` 改 expect_not_contains(IT 经理 position=approver,无权限矩阵权限)
+  - **15/15 API smoke 全过**(连续 3 轮)
+- **踩坑记录**:
+  - `ProfilesService` 未 export → factory-api 启动 DI 报错 "Nest can't resolve dependencies of MenusController" → 加 exports 解决
+  - 响应改 shape 后 `count_json` 计数变 4(顶层 key 数),不是 items 数 → 改 `get_menu` 在 shell 层用 python 抽取 items 数组,15 个测试无需改断言
+  - gateway 容器在 factory-api 重建后用旧 IP → `docker compose restart gateway` 刷新 upstream
+  - `verify-menu-visibility.sh` 调试中:
+    - `$$` 在 `python3 -c '...'` 单引号里不展开 → 用 `mktemp + TMP_MENU` 环境变量
+    - python heredoc + 单引号双引号嵌套陷阱 → 用 `os.environ["TMP_MENU"]` 简化
+    - 测试断言过严(mgr-production 不该看 quality/equipment 是错的,manager 本就该看)→ 改为"manager 看见 10 个核心菜单,无 hidden 断言"
+- **验收**:
+  - [x] `pnpm -C apps/factory-api build` + `pnpm -C apps/portal-ui build` 通过
+  - [x] 手动验收:inspector 登录 → 侧边栏只剩"工作台 + 质量管控(2 项)+ 综合管理(2 项)"
+  - [x] 验证脚本全过
+  - [x] Playwright 5/5
+  - [x] 原有 15 角色测试全过
+  - [ ] 业务侧验收(用户手动跑)
+- **文档**:`requirements/08_role-journeys/07_role-menu-mapping.md`(实现细节 + 角色菜单数表 + 重新 seed 流程)
+- **下一阶段候选**:
+  - B. L5+ 多步审批 BPMN(`multi_step_approval_v1`)
+  - C. 业务侧状态持久化(`public.workflow_bridge` 表已在,接 Flowable 回调)
+  - D. WorkOrder 落 Prisma / OpenTelemetry / 移动端 barcode-scanner(Backlog)
+
+---
+
 ## 2026-06-17  ·  全量回归 + 测试隔离机制
 
 - **类型**:测试质量提升

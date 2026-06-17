@@ -109,6 +109,22 @@ function isTreeMenuArray(value: unknown): value is MenuNode[] {
   return value.every((v) => v && typeof v === 'object' && 'id' in v && 'label' in v)
 }
 
+/**
+ * 新版后端响应: { items: ApiMenuItem[], roles: string[], profilePosition: string|null, count: number }
+ * 旧版响应: ApiMenuItem[] 或 MenuNode[] 直接返回
+ * 这里统一提取出菜单项数组
+ */
+function extractItems(raw: unknown): { items: ApiMenuItem[] | MenuNode[]; isFlat: boolean } | null {
+  if (isFlatMenuArray(raw)) return { items: raw, isFlat: true }
+  if (isTreeMenuArray(raw)) return { items: raw, isFlat: false }
+  if (raw && typeof raw === 'object' && 'items' in raw) {
+    const items = (raw as { items?: unknown }).items
+    if (isFlatMenuArray(items)) return { items, isFlat: true }
+    if (isTreeMenuArray(items)) return { items, isFlat: false }
+  }
+  return null
+}
+
 export function useUserMenu() {
   const auth = useAuth()
   const token = auth.token
@@ -135,14 +151,17 @@ export function useUserMenu() {
 
         const raw = await fetchUserMenu(token)
         if (!mounted) return
-        if (isFlatMenuArray(raw)) {
-          const injected = ensureSalesOrdersEntry(raw)
+        const extracted = extractItems(raw)
+        if (extracted?.isFlat) {
+          const flat = extracted.items as ApiMenuItem[]
+          const injected = ensureSalesOrdersEntry(flat)
           const items = DEBUG_MENU.enabled && DEBUG_MENU.mockBadIcon ? injectBadIcon(injected) : injected
           setState({ loading: false, error: null, data: buildMenuTree(items, getIconByName) })
           return
         }
-        if (isTreeMenuArray(raw)) {
-          setState({ loading: false, error: null, data: ensureSalesOrdersEntryTree(normalizeTreeMenu(raw)) })
+        if (extracted && !extracted.isFlat) {
+          const tree = extracted.items as MenuNode[]
+          setState({ loading: false, error: null, data: ensureSalesOrdersEntryTree(normalizeTreeMenu(tree)) })
           return
         }
         throw new Error('Invalid menu response')

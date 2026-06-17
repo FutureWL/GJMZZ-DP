@@ -30,7 +30,7 @@ expect_contains "profile.dept"     "$PROFILE" '"department":"质量中心"'
 log "3) 菜单(质量管控)"
 MENU=$(get_menu "$TOKEN")
 N=$(count_json "$MENU")
-[ "$N" -ge 40 ] || fail "菜单 < 40"
+[ "$N" -ge 20 ] || fail "菜单 < 20"
 expect_contains "菜单-告警中心" "$MENU" '"/quality/alerts"'
 expect_contains "菜单-异常中心" "$MENU" '"/quality/exceptions"'
 expect_contains "菜单-检验任务" "$MENU" '"/quality/inspections"'

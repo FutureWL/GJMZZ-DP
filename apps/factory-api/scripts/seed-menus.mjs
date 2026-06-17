@@ -17,6 +17,8 @@ import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { spawnSync } from 'node:child_process'
 
+import { MENU_REQUIRED_ROLES } from './menu-required-roles.mjs'
+
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const ROOT = resolve(__dirname, '..', '..', '..')
 
@@ -148,8 +150,20 @@ function execSql(sql) {
 
 async function main() {
   log(`source: ${MENUS_TS}`)
-  const items = await extractMockMenu()
-  log(`parsed ${items.length} menu items`)
+  const rawItems = await extractMockMenu()
+  log(`parsed ${rawItems.length} menu items`)
+
+  // 叠加 requiredRoles: 优先使用 MENU_REQUIRED_ROLES 映射, 否则保留原值
+  let appliedCount = 0
+  const items = rawItems.map((it) => {
+    const map = MENU_REQUIRED_ROLES[it.id]
+    if (map !== undefined) {
+      appliedCount++
+      return { ...it, requiredRoles: map }
+    }
+    return it
+  })
+  log(`applied requiredRoles for ${appliedCount} items`)
 
   const sql = generateSql(items)
   log(`generated SQL: ${sql.length} bytes, ${sql.split('\n').length} lines`)

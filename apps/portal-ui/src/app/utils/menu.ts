@@ -23,17 +23,24 @@ export function buildMenuTree(items: ApiMenuItem[], getIcon: IconGetter): MenuNo
 
   const build = (parentId: string | null): MenuNode[] => {
     const list = byParent.get(parentId) ?? []
-    return list.map((item) => {
-      const children = build(item.id)
-      const to = item.path ?? undefined
-      return {
-        id: item.id,
-        label: item.label,
-        to,
-        icon: to ? getIcon(item.iconName) : undefined,
-        children: children.length ? children : undefined,
-      }
-    })
+    return list
+      .map((item) => {
+        const children = build(item.id)
+        const to = item.path ?? undefined
+        // 隐藏逻辑:
+        // 1) 叶子(有 path) → 保留
+        // 2) 容器(无 path)若子树为空 → 不返回(隐藏空分类)
+        // 3) 容器(无 path)若有子树 → 保留,子树为 children
+        if (!to && children.length === 0) return null
+        return {
+          id: item.id,
+          label: item.label,
+          to,
+          icon: to ? getIcon(item.iconName) : undefined,
+          children: children.length ? children : undefined,
+        }
+      })
+      .filter((n): n is NonNullable<typeof n> => n !== null)
   }
 
   return build(null)
