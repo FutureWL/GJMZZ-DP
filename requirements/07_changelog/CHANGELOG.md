@@ -5,6 +5,40 @@
 
 ---
 
+## 2026-06-17  ·  GitHub 远程仓库 + CI 配置
+
+- **类型**:基础设施 / DevOps
+- **作者**:@dev
+- **影响范围**:`.github/workflows/ci.yml` + `scripts/ci/` + remote
+- **变更内容**:
+  - **git remote 新增**:`github` → `git@github.com:FutureWL/GJMZZ-DP.git`(保留原 `origin` = ssh://localhost)
+  - **GitHub Actions CI** (`.github/workflows/ci.yml`)3 个 job:
+    - `build`: `pnpm -r lint` (continue-on-error, 因为现存代码 150+ lint error) + 5 个 app build 必检
+    - `infra-validate`: `docker compose config` + BPMN XML 校验 + SQL 语法检查 + Keycloak realm JSON
+    - `e2e-role-menu`: 仅手动 `workflow_dispatch` 触发,跑 docker compose up + seed 15 用户 + Playwright
+  - **Python 校验脚本**(`scripts/ci/`):拆出独立 `.py` 文件避免 YAML 引号嵌套坑
+    - `validate-bpmn.py`: 统计 process/task/gateway 数量
+    - `validate-realm.py`: 校验 realm JSON 结构
+  - **Lint 补齐**:`apps/mobile-app/eslint.config.js` (原本缺失,从 mobile-portal-ui 复制)
+  - **手动验证脚本**:`scripts/manual-verify-inspector.mjs` + 截图(inspector vs ceo 侧边栏对比)
+- **踩坑**:
+  - GitHub 远程比本地领先 2 个 commit (CRM feat + DB init mount),先 `git merge --no-ff github/master` 再 push
+  - YAML `run: |` 嵌 Python 多行字符串 + 中文 + f-string 让 yaml scanner 误判 → 改用独立 .py 文件
+  - mobile-app 缺 eslint.config.js → 复制一份后 lint 才不报错(但因 150+ 现存 error,continue-on-error)
+- **验收**:
+  - [x] `git push github master` 成功
+  - [x] `git push origin master` 同步成功
+  - [x] `python3 scripts/ci/validate-bpmn.py` 本地跑过
+  - [x] `python3 scripts/ci/validate-realm.py` 本地跑过
+  - [x] `pnpm -C apps/factory-api build` + `pnpm -C apps/portal-ui build` 通过
+  - [ ] GitHub Actions 首次 run(待 push 后查看)
+- **限制**:
+  - e2e job 仅手动触发(在 PR 跑会拖慢 review)
+  - lint continue-on-error(后续可逐步清理后改成必检)
+  - 不在 CI 里跑 docker compose build(资源消耗大)
+
+---
+
 ## 2026-06-17  ·  角色 → 菜单可见映射(Backlog A 完成)
 
 - **类型**:新增功能 + 体验优化
