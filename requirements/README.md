@@ -16,6 +16,7 @@
 | 怎么实现 | `apps/*`、`packages/*` | `02_applications/` |
 | 怎么运行 | `docker-compose.yml`、`infra/` | `06_runtime/` |
 | 怎么变更 | (无统一位置) | `07_changelog/` |
+| 谁来建设 | (无统一位置) | `09_team/` |
 
 ## 2. 目录结构
 
@@ -64,6 +65,32 @@ requirements/
 │   ├── template.md
 │   └── CHANGELOG.md
 │
+├── 08_role-journeys/                  ← 业务角色端到端验收(15 角色)
+│   ├── 01_role-matrix-highlevel.md
+│   ├── 02_keycloak-users-seed.md
+│   ├── 03_role-matrix-middleground.md
+│   ├── 04_acceptance-checklist-middleground.md
+│   ├── 05_acceptance-checklist.md
+│   ├── 05_role-matrix-frontline.md
+│   ├── 06_acceptance-checklist-frontline.md
+│   ├── 07_role-menu-mapping.md
+│   ├── api-tests/                     ← 15 角色 API smoke 脚本
+│   ├── e2e-screenshots/               ← Playwright 截图
+│   └── ground|highlevel|middle/       ← 验收测试脚本
+│
+├── 09_team/                           ← 团队组建方案(谁来建设业务能力)
+│   ├── README.md                          索引 + 一句话总结
+│   ├── 01_团队组建总览.md                 6 个核心问题 + 招聘原则 + 阶段
+│   ├── 02_组织架构与岗位体系.md           组织架构图 + 岗位清单 + P4-P7
+│   ├── 03_岗位JD_产品.md                  产品经理 / UI/UX / 数据分析师
+│   ├── 04_岗位JD_技术.md                  技术负责人 / Flowable BPM / 前后端 / DevOps / QA
+│   ├── 05_岗位JD_制造业务.md              制造业务架构师 / 生产/质量/设备域 BA
+│   ├── 06_岗位JD_运营与支持.md            实施 / 客户成功 / HR / 法务 / 财务
+│   ├── 07_薪酬体系.md                     薪酬结构 + 级别表 + 试用期 + 调薪
+│   ├── 08_招聘流程与渠道.md               招聘渠道 + 4 轮面试 + 入职培训
+│   ├── 09_绩效晋升与文化.md               绩效考核 + 晋升通道 + 期权 + 文化建设
+│   └── 10_预算_风险_行动.md               12 月预算 + 12 风险 + 30 天行动
+│
 └── assets/                            ← 需求相关图、表格(可选)
 ```
 
@@ -77,6 +104,7 @@ requirements/
 | 写某个模块的业务代码 | 对应 `03_modules/0X_*.md` → 对应 `02_applications/0X_*.md` |
 | 跑/排障环境 | `06_runtime/` |
 | 想知道"为什么这么改" | `07_changelog/` |
+| 招人 / 组建团队 | `09_team/` |
 
 ## 4. 维护约定
 
